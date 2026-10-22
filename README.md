@@ -7,7 +7,11 @@ Application cosy & kawaii de gestion des plantes d'intérieur et d'extérieur (F
 - Avancement : [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ## Démarrer
+Raccourci : `./scripts/dev.sh` (menu interactif : git pull, préparation, analyse + tests, lancement linux / chrome / iPhone via réseau local). `./scripts/dev.sh all` enchaîne tout vers Linux.
+
 Prérequis : Flutter SDK ≥ 3.38 (exigé par drift ≥ 2.35).
+
+Étapes manuelles équivalentes :
 
 ```bash
 flutter create --project-name garden_party --platforms=android,linux,web .
