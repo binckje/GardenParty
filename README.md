@@ -11,6 +11,7 @@ Prérequis : Flutter SDK ≥ 3.22.
 
 ```bash
 flutter create --project-name garden_party --platforms=android,ios,linux,web .
+rm -f test/widget_test.dart   # test généré par défaut, référence MyApp inexistant
 flutter pub get
 flutter test
 flutter run -d linux   # ou chrome, ou un appareil Android
