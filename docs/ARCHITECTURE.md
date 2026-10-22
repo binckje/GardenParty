@@ -3,7 +3,7 @@
 ## Choix techniques
 | Sujet | Choix | Raison |
 |---|---|---|
-| Framework | Flutter (Dart 3) | Un code : Android, iOS, tablette, Linux desktop, web |
+| Framework | Flutter (Dart 3) | Un code : Android, tablette, Linux desktop, web. iOS natif hors périmètre (pas de compte Apple Developer ni de Mac) : iPhone/iPad via la version web (PWA) |
 | État | Riverpod | Simple, testable |
 | Navigation | go_router (4 onglets : Jardin, Plantes, Calendrier, Réglages) | Standard Flutter |
 | Stockage | Local hors-ligne, SQLite via `drift` (wasm sur le web) | Pas de compte, pas de serveur |

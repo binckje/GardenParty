@@ -1,6 +1,6 @@
 # GardenParty 🪴
 
-Application cosy & kawaii de gestion des plantes d'intérieur et d'extérieur (Flutter : mobile, tablette, Linux, web).
+Application cosy & kawaii de gestion des plantes d'intérieur et d'extérieur (Flutter : Android, Linux, web ; iPhone/iPad via la version web).
 
 - Cahier des charges : [docs/CAHIER_DES_CHARGES.md](docs/CAHIER_DES_CHARGES.md)
 - Architecture et sources de données : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
@@ -10,7 +10,7 @@ Application cosy & kawaii de gestion des plantes d'intérieur et d'extérieur (F
 Prérequis : Flutter SDK ≥ 3.38 (exigé par drift ≥ 2.35).
 
 ```bash
-flutter create --project-name garden_party --platforms=android,ios,linux,web .
+flutter create --project-name garden_party --platforms=android,linux,web .
 rm -f test/widget_test.dart   # test généré par défaut, référence MyApp inexistant
 flutter pub get
 dart run build_runner build   # régénère lib/data/db/database.g.dart après modif des tables
