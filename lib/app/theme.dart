@@ -28,7 +28,7 @@ ThemeData buildKawaiiTheme() {
       bodyColor: KawaiiColors.cocoa,
       displayColor: KawaiiColors.cocoa,
     ),
-    cardTheme: CardTheme(elevation: 0, color: Colors.white, shape: rounded),
+    cardTheme: CardThemeData(elevation: 0, color: Colors.white, shape: rounded),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: KawaiiColors.blush,
       shape: rounded,
