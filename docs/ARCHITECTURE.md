@@ -20,8 +20,18 @@ lib/
                plant.dart (fiche espèce, plante possédée)
                care.dart (tâches d'entretien)
   features/    garden/ plants/ calendar/ settings/
-  data/        (à venir) base drift, clients API, cache
+  data/        db/ tables drift, convertisseurs JSON, AppDatabase (+ database.g.dart généré)
+               repositories/ garden, plant, care (modèles métier ⇄ lignes SQL)
+               providers.dart  databaseProvider (surchargé en test), repositories, StreamProviders
+               (à venir) clients API, cache
 ```
+
+## Données (drift)
+- Tables : `spaces`, `openings`, `light_readings`, `plant_species`, `owned_plants`, `care_tasks`. Enums stockés par nom.
+- Sous-objets d'espèce (lumière, programmes de soin, diagnostics, bouture, rempotage) en colonnes JSON.
+- Clés étrangères actives : supprimer une pièce supprime ses ouvertures/mesures et « déplace » ses plantes hors plan ; supprimer une plante supprime ses tâches.
+- `schemaVersion` = 1 : toute modif de table ⇒ incrémenter + migration, puis `dart run build_runner build`.
+- Web (étape 7) : copier `sqlite3.wasm` et `drift_worker.js` dans `web/` (voir doc drift « Web »).
 
 ## Modèle de lumière
 - 5 niveaux communs : `shade` <250 lx, `lowLight` <1 000, `brightIndirect` <5 000, `partialSun` <20 000, `fullSun`.

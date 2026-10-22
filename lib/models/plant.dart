@@ -40,12 +40,25 @@ class CareSchedule {
 
   /// Mois (1-12) où le soin s'applique ; hors saison la fréquence est réduite.
   final List<int> activeMonths;
+
+  factory CareSchedule.fromJson(Map<String, dynamic> j) => CareSchedule(
+        everyDays: j['everyDays'] as int,
+        quantity: j['quantity'] as String,
+        activeMonths: (j['activeMonths'] as List).cast<int>(),
+      );
+
+  Map<String, dynamic> toJson() => {'everyDays': everyDays, 'quantity': quantity, 'activeMonths': activeMonths};
 }
 
 class Diagnostic {
   const Diagnostic({required this.symptom, required this.cause, required this.treatment});
 
   final String symptom, cause, treatment;
+
+  factory Diagnostic.fromJson(Map<String, dynamic> j) =>
+      Diagnostic(symptom: j['symptom'] as String, cause: j['cause'] as String, treatment: j['treatment'] as String);
+
+  Map<String, dynamic> toJson() => {'symptom': symptom, 'cause': cause, 'treatment': treatment};
 }
 
 class PropagationInfo {
@@ -53,6 +66,11 @@ class PropagationInfo {
 
   final bool possible;
   final String? method;
+
+  factory PropagationInfo.fromJson(Map<String, dynamic> j) =>
+      PropagationInfo(possible: j['possible'] as bool, method: j['method'] as String?);
+
+  Map<String, dynamic> toJson() => {'possible': possible, 'method': method};
 }
 
 class RepottingInfo {
@@ -61,6 +79,11 @@ class RepottingInfo {
   final bool needed;
   final int? everyYears;
   final String? period;
+
+  factory RepottingInfo.fromJson(Map<String, dynamic> j) =>
+      RepottingInfo(needed: j['needed'] as bool, everyYears: j['everyYears'] as int?, period: j['period'] as String?);
+
+  Map<String, dynamic> toJson() => {'needed': needed, 'everyYears': everyYears, 'period': period};
 }
 
 /// Plante possédée par l'utilisateur, placée dans une pièce/zone.
