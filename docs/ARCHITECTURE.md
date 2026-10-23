@@ -25,7 +25,8 @@ lib/
   data/        db/ tables drift, convertisseurs JSON, AppDatabase (+ database.g.dart généré)
                repositories/ garden, plant, care (modèles métier ⇄ lignes SQL)
                providers.dart  databaseProvider (surchargé en test), repositories, StreamProviders
-               (à venir) clients API, cache
+               api/ clients Perenual, GBIF, Pl@ntNet ; ApiCache (GET JSON en cache SQLite) ;
+                    species_mapper (Perenual → PlantSpecies) ; PlantLookupService (recherche nom/photo)
   services/    care_notifications.dart, google/ (auth io/web, synchro agenda)
 ```
 
@@ -41,7 +42,7 @@ lib/
 - Tables : `spaces`, `openings`, `light_readings`, `plant_species`, `owned_plants`, `care_tasks`. Enums stockés par nom.
 - Sous-objets d'espèce (lumière, programmes de soin, diagnostics, bouture, rempotage) en colonnes JSON.
 - Clés étrangères actives : supprimer une pièce supprime ses ouvertures/mesures et « déplace » ses plantes hors plan ; supprimer une plante supprime ses tâches.
-- `schemaVersion` = 1 : toute modif de table ⇒ incrémenter + migration, puis `dart run build_runner build`.
+- `schemaVersion` = 2 (v2 : table `api_cache_entries`) : toute modif de table ⇒ incrémenter + migration, puis `dart run build_runner build`.
 - Web (étape 7) : copier `sqlite3.wasm` et `drift_worker.js` dans `web/` (voir doc drift « Web »).
 
 ## Modèle de lumière
@@ -65,3 +66,10 @@ Quotas à revérifier avant intégration (ils changent souvent).
 | **Base locale curée** (JSON embarqué) | ~50 plantes courantes, en FR | — | Fonctionne hors-ligne, complète les trous des API |
 
 Stratégie : base locale d'abord → Perenual → enrichissement GBIF/Wikipedia ; résultat mis en cache dans SQLite.
+
+Implémentation (étape 6) :
+- Clés : `.env` (non versionné, modèle `.env.example`) → `--dart-define-from-file=.env` via `dev.sh` → `ApiKeys.fromEnvironment()`.
+- Cache : réponses JSON par URL sans clé API ; 7 j (recherches), 30 j (GBIF), 90 j (fiches Perenual) ; cache périmé resservi si réseau/quota en échec. Pl@ntNet jamais mis en cache.
+- Recherche par nom : Perenual ; sans résultat (nom français), GBIF donne le nom scientifique puis Perenual est relancé.
+- Fiche : Perenual → `PlantSpecies` (id `perenual-<id>`), nom français = nom vernaculaire GBIF le plus fréquent ; rusticité USDA → température mini ; engrais : valeur par défaut (Perenual ne la fournit pas).
+- Web : GBIF et Perenual acceptent les appels navigateur ; Pl@ntNet exige d'autoriser le domaine dans le compte my.plantnet.org.

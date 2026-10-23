@@ -17,3 +17,6 @@ web/.drift_assets
 
 # Identifiants OAuth Google Agenda (voir google_oauth.env.example)
 google_oauth.env
+
+# Clés API locales (voir .env.example)
+.env

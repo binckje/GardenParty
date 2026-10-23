@@ -90,6 +90,7 @@ prepare() {
   echo "$lock_hash" > "$stamp"
 
   web_assets
+  api_keys
 
   step "Code généré (drift)"
   local gen=lib/data/db/database.g.dart
@@ -121,6 +122,20 @@ web_assets() {
   ok "Téléchargés : sqlite3.wasm $sqlite, drift_worker.js $drift"
 }
 
+# Clés API (Perenual, Pl@ntNet) : fichier .env non versionné, passé à flutter run.
+api_keys() {
+  step "Clés API"
+  if [[ ! -f .env ]]; then
+    cp .env.example .env
+    warn ".env créé depuis .env.example : renseigne PERENUAL_KEY et PLANTNET_KEY (recherche en ligne désactivée sinon)"
+    return 0
+  fi
+  local k
+  for k in PERENUAL_KEY PLANTNET_KEY; do
+    if grep -qE "^$k=.+" .env; then ok "$k renseignée"; else warn "$k vide dans .env"; fi
+  done
+}
+
 run_checks() {
   step "Analyse"
   flutter analyze || { ask "Analyse en échec, continuer ?" || exit 1; }
@@ -128,14 +143,16 @@ run_checks() {
   flutter test || { ask "Tests en échec, continuer ?" || exit 1; }
 }
 
-# Identifiants OAuth Google Agenda (facultatifs) : google_oauth.env, non versionné.
+# Fichiers de --dart-define non versionnés : identifiants OAuth Google Agenda et clés API (facultatifs).
 google_defines() {
+  DEFINES=()
   if [[ -f google_oauth.env ]]; then
-    DEFINES=(--dart-define-from-file=google_oauth.env)
+    DEFINES+=(--dart-define-from-file=google_oauth.env)
   else
-    DEFINES=()
     warn "google_oauth.env absent : synchro Google Agenda désactivée (voir google_oauth.env.example)"
   fi
+  [[ -f .env ]] && DEFINES+=(--dart-define-from-file=.env)
+  return 0
 }
 
 launch() {
@@ -187,7 +204,7 @@ main() {
   echo "${c_info}GardenParty — dev${c_off}"
   echo "  1) Tout : git → préparation → tests → lancement"
   echo "  2) Git seulement"
-  echo "  3) Préparation (plateformes, pub get, fichiers web drift, génération drift)"
+  echo "  3) Préparation (plateformes, pub get, fichiers web drift, clés API, génération drift)"
   echo "  4) Analyse + tests"
   echo "  5) Lancer l'app"
   echo "  6) Tout sauf git (code local)"

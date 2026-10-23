@@ -2,10 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/care.dart';
 import '../models/garden.dart';
 import '../models/plant.dart';
+import 'api/api_cache.dart';
+import 'api/api_config.dart';
+import 'api/gbif_client.dart';
+import 'api/perenual_client.dart';
+import 'api/plant_lookup_service.dart';
+import 'api/plantnet_client.dart';
 import 'db/database.dart';
 import 'repositories/care_repository.dart';
 import 'repositories/garden_repository.dart';
@@ -38,3 +45,22 @@ final speciesCatalogProvider = FutureProvider<void>((ref) async {
 
 /// Plante en attente de placement : l'écran du plan attend un appui pour la poser.
 final placingPlantProvider = StateProvider<String?>((ref) => null);
+
+// API en ligne. Les tests remplacent httpClientProvider (MockClient) et apiKeysProvider.
+final apiKeysProvider = Provider((ref) => const ApiKeys.fromEnvironment());
+final httpClientProvider = Provider<http.Client>((ref) {
+  final client = http.Client();
+  ref.onDispose(client.close);
+  return client;
+});
+final apiCacheProvider = Provider((ref) => ApiCache(ref.watch(databaseProvider), ref.watch(httpClientProvider)));
+final plantLookupProvider = Provider((ref) {
+  final cache = ref.watch(apiCacheProvider);
+  final keys = ref.watch(apiKeysProvider);
+  return PlantLookupService(
+    perenual: PerenualClient(cache, keys.perenual),
+    gbif: GbifClient(cache),
+    plantnet: PlantNetClient(ref.watch(httpClientProvider), keys.plantnet),
+    plants: ref.watch(plantRepositoryProvider),
+  );
+});

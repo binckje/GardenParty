@@ -24,6 +24,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - `LightAnalysis.bestSpots(spaces, species.light)` : emplacements conseillés, pas encore affichés.
   - `dev.sh` : web-server en HTTPS (certificat auto-signé dans `.dart_tool/dev_cert`), nécessaire à la caméra sur iPhone.
   - 35 tests OK (Flutter 3.47). Validé par l'utilisateur.
+- Étape 6 (couche données sans UI, choix utilisateur) : `lib/data/api/` (Perenual, GBIF, Pl@ntNet, cache SQLite, `PlantLookupService`), providers dans `providers.dart`, table `api_cache_entries` (schemaVersion 2). Clés dans `.env` (modèle `.env.example`), passées par `dev.sh`. 42 tests OK (7 nouveaux, réseau simulé). Non testé contre les vraies API (réseau du conteneur bloqué) : à valider par l'utilisateur. Wikipedia reporté.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -32,6 +33,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
 4. Google Agenda (facultatif) : suivre `google_oauth.env.example`, créer `google_oauth.env`, relancer, Réglages → « Connecter Google Agenda » → agenda « GardenParty 🌱 » visible dans Google Agenda.
 5. Android : notification à 9 h le jour d'un soin, même app fermée.
+
 
 ## En attente de décision
 - Caméra en exposition automatique (aucune plateforme n'expose ISO / temps de pose via `camera`) : estimation grossière, préférer capteur ou saisie.
@@ -45,4 +47,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Afficher les emplacements conseillés (`LightAnalysis.bestSpots`) sur la fiche plante / espèce, puis étape 6 : API.
+Afficher les emplacements conseillés (`LightAnalysis.bestSpots`) sur la fiche plante / espèce, et écran de recherche en ligne (nom / photo) branché sur `plantLookupProvider` dans le catalogue.

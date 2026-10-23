@@ -97,3 +97,14 @@ class CareTasks extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Réponses JSON des API (Perenual, GBIF) indexées par URL sans clé API.
+@DataClassName('ApiCacheRow')
+class ApiCacheEntries extends Table {
+  TextColumn get key => text()();
+  TextColumn get body => text()();
+  DateTimeColumn get fetchedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}
