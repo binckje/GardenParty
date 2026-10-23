@@ -7,6 +7,7 @@ import '../../models/plant.dart';
 import '../dialogs.dart';
 import 'online_search.dart';
 import 'plant_screen.dart';
+import 'species_editor.dart';
 import 'species_view.dart';
 
 /// Recherche insensible à la casse et aux accents : « geranium » trouve « Géranium ».
@@ -41,6 +42,16 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         backgroundColor: Colors.transparent,
         actions: [
           IconButton(
+            tooltip: 'Créer une fiche',
+            icon: const Icon(Icons.note_add_outlined),
+            onPressed: () async {
+              final nav = Navigator.of(context);
+              final created =
+                  await nav.push<PlantSpecies>(MaterialPageRoute(builder: (_) => const SpeciesEditorScreen()));
+              if (created != null) nav.push(MaterialPageRoute(builder: (_) => SpeciesScreen(species: created)));
+            },
+          ),
+          IconButton(
             tooltip: 'Identifier par photo',
             icon: const Icon(Icons.photo_camera),
             onPressed: () => identifyFromPhoto(context, ref),
@@ -71,7 +82,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     leading: SpeciesVisual(s),
                     title: Text(s.commonName),
                     subtitle: Text(s.scientificName, style: const TextStyle(fontStyle: FontStyle.italic)),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SpeciesScreen(species: s))),
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => SpeciesScreen(species: s))),
                   ),
                 OnlineResults(query: _query),
               ]);
@@ -102,7 +114,24 @@ class SpeciesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-        appBar: AppBar(title: Text(species.commonName), backgroundColor: Colors.transparent),
+        appBar: AppBar(
+          title: Text(species.commonName),
+          backgroundColor: Colors.transparent,
+          actions: [
+            IconButton(
+              tooltip: 'Modifier la fiche',
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () async {
+                final nav = Navigator.of(context);
+                final edited = await nav.push<PlantSpecies>(
+                  MaterialPageRoute(builder: (_) => SpeciesEditorScreen(initial: species)),
+                );
+                if (edited == null) return;
+                nav.pushReplacement(MaterialPageRoute(builder: (_) => SpeciesScreen(species: edited)));
+              },
+            ),
+          ],
+        ),
         floatingActionButton: FloatingActionButton.extended(
           icon: const Icon(Icons.add),
           label: const Text('Ajouter au jardin'),

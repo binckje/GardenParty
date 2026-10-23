@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -18,10 +19,18 @@ String lightLabel(LightLevel l) => switch (l) {
 /// Emoji de la plante, utilisable dans un texte ou sur le plan.
 String speciesEmoji(PlantSpecies? s) {
   final v = s?.imageUrl;
-  return v == null || v.isEmpty || v.startsWith('http') || v.startsWith('assets/') ? '🪴' : v;
+  return v == null || v.isEmpty || v.startsWith('http') || v.startsWith('assets/') || v.startsWith('data:') ? '🪴' : v;
 }
 
-/// Visuel d'une espèce : image (URL ou asset) si fournie, sinon emoji.
+/// Octets décodés des photos en data URI, gardés pour ne pas redécoder l'image à chaque affichage.
+final _dataCache = <String, Uint8List>{};
+
+Uint8List _dataBytes(String uri) {
+  if (_dataCache.length > 64) _dataCache.clear();
+  return _dataCache[uri] ??= UriData.parse(uri).contentAsBytes();
+}
+
+/// Visuel d'une espèce : image (URL, asset ou photo en data URI) si fournie, sinon emoji.
 class SpeciesVisual extends StatelessWidget {
   const SpeciesVisual(this.species, {super.key, this.size = 40});
 
@@ -34,9 +43,12 @@ class SpeciesVisual extends StatelessWidget {
     final fallback = Text(speciesEmoji(species), style: TextStyle(fontSize: size * 0.7));
     final Widget child = v.startsWith('http')
         ? Image.network(v, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallback)
-        : v.startsWith('assets/')
-            ? Image.asset(v, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallback)
-            : fallback;
+        : v.startsWith('data:')
+            // Photo prise dans l'éditeur de fiche (data URI base64).
+            ? Image.memory(_dataBytes(v), fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, __, ___) => fallback)
+            : v.startsWith('assets/')
+                ? Image.asset(v, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallback)
+                : fallback;
     return Container(
       width: size,
       height: size,
