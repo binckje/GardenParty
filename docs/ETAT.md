@@ -19,7 +19,8 @@ Branche de travail : `claude/new-session-7hha19`.
   - `scripts/patch_android.py` : desugaring + récepteurs de notifications dans `android/` (appelé par `dev.sh`). `dev.sh` passe `google_oauth.env` en `--dart-define-from-file` et fixe le port 8080 pour chrome.
   - 29 tests OK (Flutter 3.47). Build web vérifié dans Chromium. Builds Linux/Android non testés ici (pas de GTK ni SDK Android).
 
-## À tester par l'utilisateur (étape 4)
+## Tests reportés (étape 4)
+Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
 2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
 3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
@@ -37,4 +38,4 @@ Branche de travail : `claude/new-session-7hha19`.
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Étape 5 : lumière (mesure caméra, calibrage, carte de chaleur, suggestions d'emplacement), après validation de l'étape 4.
+Étape 5 : lumière (mesure caméra, calibrage, carte de chaleur, suggestions d'emplacement).
