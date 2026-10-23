@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/care.dart';
@@ -24,3 +27,14 @@ final speciesProvider = StreamProvider<List<PlantSpecies>>((ref) => ref.watch(pl
 final ownedPlantsProvider =
     StreamProvider<List<OwnedPlant>>((ref) => ref.watch(plantRepositoryProvider).watchOwnedPlants());
 final pendingTasksProvider = StreamProvider<List<CareTask>>((ref) => ref.watch(careRepositoryProvider).watchPending());
+
+/// Charge la base locale `assets/plants_fr.json` dans la table des espèces.
+final speciesCatalogProvider = FutureProvider<void>((ref) async {
+  final json = jsonDecode(await rootBundle.loadString('assets/plants_fr.json')) as List;
+  await ref
+      .read(plantRepositoryProvider)
+      .addMissingSpecies([for (final j in json) PlantSpecies.fromJson(j as Map<String, dynamic>)]);
+});
+
+/// Plante en attente de placement : l'écran du plan attend un appui pour la poser.
+final placingPlantProvider = StateProvider<String?>((ref) => null);

@@ -18,14 +18,26 @@ class PlanView {
   Rect rectToScreen(Rect m) => Rect.fromPoints(toScreen(m.topLeft), toScreen(m.bottomRight));
 }
 
+/// Plante à dessiner : position absolue en mètres.
+class PlanPlant {
+  const PlanPlant({required this.id, required this.emoji, required this.position});
+
+  final String id;
+  final String emoji;
+  final Offset position;
+}
+
 class PlanPainter extends CustomPainter {
-  PlanPainter({required this.spaces, required this.view, this.selectedId});
+  PlanPainter({required this.spaces, required this.view, this.selectedId, this.plants = const [], this.draggedPlantId});
 
   final List<Space> spaces;
   final PlanView view;
   final String? selectedId;
+  final List<PlanPlant> plants;
+  final String? draggedPlantId;
 
   static const handleRadius = 10.0;
+  static const plantRadius = 16.0;
   static const _window = Color(0xFF9FD3F0);
 
   @override
@@ -34,6 +46,30 @@ class PlanPainter extends CustomPainter {
     for (final s in PlanGeometry.drawOrder(spaces)) {
       _paintSpace(canvas, s, selected: s.id == selectedId);
     }
+    for (final p in plants) {
+      _paintPlant(canvas, p);
+    }
+  }
+
+  void _paintPlant(Canvas canvas, PlanPlant p) {
+    final c = view.toScreen(p.position);
+    final dragged = p.id == draggedPlantId;
+    final r = dragged ? plantRadius * 1.25 : plantRadius;
+    canvas.drawCircle(c + const Offset(0, 2), r, Paint()..color = KawaiiColors.cocoa.withValues(alpha: 0.2));
+    canvas.drawCircle(c, r, Paint()..color = Colors.white);
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = KawaiiColors.leaf,
+    );
+    final emoji = TextPainter(
+      text: TextSpan(text: p.emoji, style: TextStyle(fontSize: r * 1.1)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    emoji.paint(canvas, c - Offset(emoji.width / 2, emoji.height / 2));
   }
 
   void _paintGrid(Canvas canvas, Size size) {

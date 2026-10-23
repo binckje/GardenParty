@@ -1,0 +1,1490 @@
+[
+ {
+  "id": "monstera",
+  "commonName": "Monstera",
+  "scientificName": "Monstera deliciosa",
+  "image": "🌿",
+  "light": [
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau plantes vertes, écorce de pin et perlite",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "500 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   },
+   {
+    "symptom": "Tiges longues et pâles",
+    "cause": "Manque de lumière",
+    "treatment": "Rapprocher d'une fenêtre lumineuse"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige avec un nœud et une racine aérienne, dans l'eau"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "pothos",
+  "commonName": "Pothos",
+  "scientificName": "Epipremnum aureum",
+  "image": "🍃",
+  "light": [
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "300 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige sous un nœud, dans l'eau"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "sansevieria",
+  "commonName": "Langue de belle-mère",
+  "scientificName": "Dracaena trifasciata",
+  "image": "🪴",
+  "light": [
+   "lowLight",
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": 12,
+  "maxTempC": 32,
+  "soil": "Terreau cactées, sable et pouzzolane",
+  "watering": {
+   "everyDays": 21,
+   "quantity": "200 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 60,
+   "quantity": "Engrais cactées",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Base des feuilles molle et noire",
+    "cause": "Pourriture par excès d'eau",
+    "treatment": "Retirer les parties pourries, rempoter au sec"
+   },
+   {
+    "symptom": "Tiges longues et pâles",
+    "cause": "Manque de lumière",
+    "treatment": "Rapprocher d'une fenêtre lumineuse"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tronçon de feuille plantée dans du sable"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 3,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "zamioculcas",
+  "commonName": "Zamioculcas",
+  "scientificName": "Zamioculcas zamiifolia",
+  "image": "🌱",
+  "light": [
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau cactées, sable et pouzzolane",
+  "watering": {
+   "everyDays": 21,
+   "quantity": "250 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 60,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Folioles qui tombent",
+    "cause": "Arrosage trop fréquent",
+    "treatment": "Arroser seulement quand le terreau est sec en profondeur"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de foliole dans du terreau humide (lente)"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 3,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "ficus-lyrata",
+  "commonName": "Figuier lyre",
+  "scientificName": "Ficus lyrata",
+  "image": "🌳",
+  "light": [
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "500 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Chute de feuilles",
+    "cause": "Changement de place ou courant d'air",
+    "treatment": "Ne plus le déplacer, éviter les courants d'air"
+   },
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tête au printemps, sous serre"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "calathea",
+  "commonName": "Calathea",
+  "scientificName": "Goeppertia orbifolia",
+  "image": "🍃",
+  "light": [
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": 18,
+  "maxTempC": 28,
+  "soil": "Terreau léger et humifère",
+  "watering": {
+   "everyDays": 5,
+   "quantity": "250 ml d'eau non calcaire",
+   "activeMonths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles qui s'enroulent",
+    "cause": "Air trop sec ou soif",
+    "treatment": "Arroser à l'eau douce, augmenter l'humidité"
+   },
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   },
+   {
+    "symptom": "Fines toiles, feuilles ternies",
+    "cause": "Araignées rouges (air sec)",
+    "treatment": "Doucher le feuillage, augmenter l'humidité"
+   }
+  ],
+  "cutting": {
+   "possible": false,
+   "method": null
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "chlorophytum",
+  "commonName": "Plante araignée",
+  "scientificName": "Chlorophytum comosum",
+  "image": "🌿",
+  "light": [
+   "lowLight",
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": 10,
+  "maxTempC": 28,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "250 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   },
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Repiquer les rejets (bébés) au bout des stolons"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "spathiphyllum",
+  "commonName": "Fleur de lune",
+  "scientificName": "Spathiphyllum wallisii",
+  "image": "🤍",
+  "light": [
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": 16,
+  "maxTempC": 28,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 5,
+   "quantity": "300 ml",
+   "activeMonths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais plantes fleuries",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Plante entièrement affaissée",
+    "cause": "Soif",
+    "treatment": "Arroser par trempage, elle se redresse en quelques heures"
+   },
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Division de la touffe au rempotage"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "aloe-vera",
+  "commonName": "Aloe vera",
+  "scientificName": "Aloe barbadensis",
+  "image": "🌵",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": 8,
+  "maxTempC": 35,
+  "soil": "Terreau cactées, sable et pouzzolane",
+  "watering": {
+   "everyDays": 21,
+   "quantity": "150 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 60,
+   "quantity": "Engrais cactées",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Tiges longues et pâles",
+    "cause": "Manque de lumière",
+    "treatment": "Rapprocher d'une fenêtre lumineuse"
+   },
+   {
+    "symptom": "Feuilles rouges ou brunes",
+    "cause": "Trop de soleil brutal",
+    "treatment": "Acclimater progressivement au soleil"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Séparer les rejets à la base, laisser sécher 2 jours"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "cactus-cierge",
+  "commonName": "Cactus cierge",
+  "scientificName": "Cereus peruvianus",
+  "image": "🌵",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": 5,
+  "maxTempC": 38,
+  "soil": "Terreau cactées, sable et pouzzolane",
+  "watering": {
+   "everyDays": 21,
+   "quantity": "150 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 60,
+   "quantity": "Engrais cactées",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   },
+   {
+    "symptom": "Tiges longues et pâles",
+    "cause": "Manque de lumière",
+    "treatment": "Rapprocher d'une fenêtre lumineuse"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tronçon, laisser cicatriser une semaine"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 3,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "orchidee",
+  "commonName": "Orchidée papillon",
+  "scientificName": "Phalaenopsis",
+  "image": "🌸",
+  "light": [
+   "brightIndirect"
+  ],
+  "minTempC": 16,
+  "maxTempC": 30,
+  "soil": "Écorce de pin pour orchidées",
+  "watering": {
+   "everyDays": 10,
+   "quantity": "Trempage 10 min",
+   "activeMonths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais orchidées",
+   "activeMonths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Racines grises et sèches",
+    "cause": "Soif",
+    "treatment": "Tremper le pot 10 minutes"
+   },
+   {
+    "symptom": "Racines brunes et molles",
+    "cause": "Excès d'eau",
+    "treatment": "Couper les racines pourries, rempoter dans de l'écorce neuve"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Repiquer les keikis (plantules) quand ils ont 3 racines"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "après la floraison"
+  }
+ },
+ {
+  "id": "ficus-elastica",
+  "commonName": "Caoutchouc",
+  "scientificName": "Ficus elastica",
+  "image": "🌳",
+  "light": [
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 10,
+   "quantity": "400 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Chute des feuilles du bas",
+    "cause": "Manque de lumière ou excès d'eau",
+    "treatment": "Plus de lumière, espacer les arrosages"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tête ou marcottage aérien"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "philodendron",
+  "commonName": "Philodendron cordatum",
+  "scientificName": "Philodendron hederaceum",
+  "image": "🍃",
+  "light": [
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": 15,
+  "maxTempC": 30,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "300 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   },
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige sous un nœud, dans l'eau"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "pilea",
+  "commonName": "Plante à monnaie",
+  "scientificName": "Pilea peperomioides",
+  "image": "🪙",
+  "light": [
+   "brightIndirect"
+  ],
+  "minTempC": 12,
+  "maxTempC": 28,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "200 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles qui se recourbent en dôme",
+    "cause": "Trop de lumière directe",
+    "treatment": "Tourner le pot, éloigner du soleil"
+   },
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Repiquer les rejets qui poussent au pied"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 1,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "lierre",
+  "commonName": "Lierre",
+  "scientificName": "Hedera helix",
+  "image": "🍀",
+  "light": [
+   "shade",
+   "lowLight",
+   "brightIndirect"
+  ],
+  "minTempC": -10,
+  "maxTempC": 25,
+  "soil": "Terreau plantes vertes drainant",
+  "watering": {
+   "everyDays": 7,
+   "quantity": "250 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais plantes vertes, demi-dose",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Fines toiles, feuilles ternies",
+    "cause": "Araignées rouges (air sec)",
+    "treatment": "Doucher le feuillage, augmenter l'humidité"
+   },
+   {
+    "symptom": "Pointes des feuilles brunes",
+    "cause": "Air trop sec ou arrosage irrégulier",
+    "treatment": "Brumiser ou poser sur un plateau de billes d'argile humides"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige dans l'eau ou le terreau"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "basilic",
+  "commonName": "Basilic",
+  "scientificName": "Ocimum basilicum",
+  "image": "🌿",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": 12,
+  "maxTempC": 32,
+  "soil": "Terreau potager enrichi en compost",
+  "watering": {
+   "everyDays": 2,
+   "quantity": "200 ml",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais aromatiques",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles noircies",
+    "cause": "Froid ou eau sur le feuillage",
+    "treatment": "Garder au-dessus de 12 °C, arroser au pied"
+   },
+   {
+    "symptom": "Petits insectes verts sur les jeunes pousses",
+    "cause": "Pucerons",
+    "treatment": "Pulvériser du savon noir dilué, favoriser les coccinelles"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tête dans un verre d'eau"
+  },
+  "repotting": {
+   "needed": false,
+   "everyYears": null,
+   "period": null
+  }
+ },
+ {
+  "id": "menthe",
+  "commonName": "Menthe",
+  "scientificName": "Mentha spicata",
+  "image": "🌱",
+  "light": [
+   "lowLight",
+   "brightIndirect",
+   "partialSun"
+  ],
+  "minTempC": -15,
+  "maxTempC": 30,
+  "soil": "Terreau potager enrichi en compost",
+  "watering": {
+   "everyDays": 3,
+   "quantity": "250 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais aromatiques",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Taches orangées sous les feuilles",
+    "cause": "Rouille",
+    "treatment": "Couper les tiges atteintes à ras"
+   },
+   {
+    "symptom": "Petits insectes verts sur les jeunes pousses",
+    "cause": "Pucerons",
+    "treatment": "Pulvériser du savon noir dilué, favoriser les coccinelles"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige ou division de touffe"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 1,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "romarin",
+  "commonName": "Romarin",
+  "scientificName": "Salvia rosmarinus",
+  "image": "🌲",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": -10,
+  "maxTempC": 35,
+  "soil": "Terre légère, sableuse et drainante",
+  "watering": {
+   "everyDays": 10,
+   "quantity": "300 ml",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 60,
+   "quantity": "Engrais aromatiques",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles qui sèchent depuis la base",
+    "cause": "Excès d'eau en hiver",
+    "treatment": "Drainage, arroser très peu en hiver"
+   },
+   {
+    "symptom": "Feutrage blanc sur les feuilles",
+    "cause": "Oïdium",
+    "treatment": "Supprimer les feuilles atteintes, pulvériser du bicarbonate dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige semi-aoûtée en fin d'été"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "lavande",
+  "commonName": "Lavande",
+  "scientificName": "Lavandula angustifolia",
+  "image": "💜",
+  "light": [
+   "fullSun"
+  ],
+  "minTempC": -15,
+  "maxTempC": 35,
+  "soil": "Terre calcaire, pauvre et drainante",
+  "watering": {
+   "everyDays": 10,
+   "quantity": "500 ml",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 90,
+   "quantity": "Aucun ou très peu",
+   "activeMonths": [
+    4
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Touffe dégarnie au centre",
+    "cause": "Pas de taille",
+    "treatment": "Tailler après la floraison sans couper le vieux bois"
+   },
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige en fin d'été"
+  },
+  "repotting": {
+   "needed": false,
+   "everyYears": null,
+   "period": null
+  }
+ },
+ {
+  "id": "tomate",
+  "commonName": "Tomate",
+  "scientificName": "Solanum lycopersicum",
+  "image": "🍅",
+  "light": [
+   "fullSun"
+  ],
+  "minTempC": 12,
+  "maxTempC": 32,
+  "soil": "Terreau potager enrichi en compost",
+  "watering": {
+   "everyDays": 2,
+   "quantity": "1 L au pied",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais tomates",
+   "activeMonths": [
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Taches brunes sur feuilles et fruits",
+    "cause": "Mildiou",
+    "treatment": "Arroser au pied, abriter de la pluie, retirer les feuilles touchées"
+   },
+   {
+    "symptom": "Cul noir des fruits",
+    "cause": "Arrosage irrégulier (manque de calcium)",
+    "treatment": "Arrosages réguliers, pailler"
+   },
+   {
+    "symptom": "Petits insectes verts sur les jeunes pousses",
+    "cause": "Pucerons",
+    "treatment": "Pulvériser du savon noir dilué, favoriser les coccinelles"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture des gourmands dans l'eau"
+  },
+  "repotting": {
+   "needed": false,
+   "everyYears": null,
+   "period": null
+  }
+ },
+ {
+  "id": "fraisier",
+  "commonName": "Fraisier",
+  "scientificName": "Fragaria × ananassa",
+  "image": "🍓",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": -10,
+  "maxTempC": 30,
+  "soil": "Terreau potager enrichi en compost",
+  "watering": {
+   "everyDays": 3,
+   "quantity": "500 ml",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais fruits rouges",
+   "activeMonths": [
+    4,
+    5,
+    6
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Fruits pourris couverts de gris",
+    "cause": "Botrytis",
+    "treatment": "Pailler, aérer, retirer les fruits atteints"
+   },
+   {
+    "symptom": "Feutrage blanc sur les feuilles",
+    "cause": "Oïdium",
+    "treatment": "Supprimer les feuilles atteintes, pulvériser du bicarbonate dilué"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Repiquer les stolons enracinés"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 3,
+   "period": "fin d'été"
+  }
+ },
+ {
+  "id": "geranium",
+  "commonName": "Géranium",
+  "scientificName": "Pelargonium zonale",
+  "image": "🌺",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": 5,
+  "maxTempC": 32,
+  "soil": "Terreau géraniums",
+  "watering": {
+   "everyDays": 4,
+   "quantity": "500 ml",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais plantes fleuries",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Peu de fleurs",
+    "cause": "Manque de soleil ou d'engrais",
+    "treatment": "Plein soleil, engrais riche en potasse"
+   },
+   {
+    "symptom": "Feuilles jaunes et molles",
+    "cause": "Excès d'arrosage",
+    "treatment": "Laisser sécher le terreau entre deux arrosages, vérifier le drainage"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige en fin d'été"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 1,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "hortensia",
+  "commonName": "Hortensia",
+  "scientificName": "Hydrangea macrophylla",
+  "image": "💠",
+  "light": [
+   "shade",
+   "partialSun"
+  ],
+  "minTempC": -15,
+  "maxTempC": 30,
+  "soil": "Terre de bruyère",
+  "watering": {
+   "everyDays": 3,
+   "quantity": "2 L",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais terre de bruyère",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes, nervures vertes",
+    "cause": "Chlorose (sol calcaire)",
+    "treatment": "Arroser à l'eau de pluie, apport de fer"
+   },
+   {
+    "symptom": "Taches brunes sèches sur les feuilles",
+    "cause": "Coup de soleil",
+    "treatment": "Éloigner du soleil direct de l'après-midi"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de tige non fleurie en été"
+  },
+  "repotting": {
+   "needed": false,
+   "everyYears": null,
+   "period": null
+  }
+ },
+ {
+  "id": "olivier",
+  "commonName": "Olivier",
+  "scientificName": "Olea europaea",
+  "image": "🫒",
+  "light": [
+   "fullSun"
+  ],
+  "minTempC": -8,
+  "maxTempC": 40,
+  "soil": "Terre drainante avec graviers",
+  "watering": {
+   "everyDays": 10,
+   "quantity": "2 L",
+   "activeMonths": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 30,
+   "quantity": "Engrais agrumes et oliviers",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles qui tombent en hiver",
+    "cause": "Froid ou excès d'eau",
+    "treatment": "Abriter sous -5 °C, réduire l'arrosage"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   }
+  ],
+  "cutting": {
+   "possible": false,
+   "method": null
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 3,
+   "period": "printemps"
+  }
+ },
+ {
+  "id": "citronnier",
+  "commonName": "Citronnier",
+  "scientificName": "Citrus limon",
+  "image": "🍋",
+  "light": [
+   "partialSun",
+   "fullSun"
+  ],
+  "minTempC": 5,
+  "maxTempC": 35,
+  "soil": "Terreau agrumes",
+  "watering": {
+   "everyDays": 5,
+   "quantity": "1 L",
+   "activeMonths": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "fertilizing": {
+   "everyDays": 15,
+   "quantity": "Engrais agrumes",
+   "activeMonths": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  "diagnostics": [
+   {
+    "symptom": "Feuilles jaunes, nervures vertes",
+    "cause": "Carence en fer",
+    "treatment": "Engrais agrumes avec fer, eau de pluie"
+   },
+   {
+    "symptom": "Amas cotonneux blancs",
+    "cause": "Cochenilles farineuses",
+    "treatment": "Nettoyer au coton imbibé d'alcool, savon noir dilué"
+   },
+   {
+    "symptom": "Chute des fleurs",
+    "cause": "Changement brusque de place ou de température",
+    "treatment": "Rentrer progressivement à l'automne"
+   }
+  ],
+  "cutting": {
+   "possible": true,
+   "method": "Bouture de rameau semi-aoûté, sous mini-serre"
+  },
+  "repotting": {
+   "needed": true,
+   "everyYears": 2,
+   "period": "printemps"
+  }
+ }
+]

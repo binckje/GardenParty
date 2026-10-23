@@ -9,6 +9,8 @@ Branche de travail : `claude/new-session-7hha19`.
 - Web drift : `web/` versionné (index.html, manifest en FR, couleurs du thème). `sqlite3.wasm` et `drift_worker.js` téléchargés par `dev.sh` (étape préparation) selon les versions de `pubspec.lock`, non versionnés. Vérifié dans Chromium : stockage IndexedDB, plan conservé après rechargement.
 - Étape 2 : éditeur du plan (`lib/features/garden/`) : `plan_geometry.dart` (calculs, aimantation 0,25 m, taille mini 0,5 m), `plan_painter.dart` (grille 1 m, pièces au-dessus des zones, portes avec arc, fenêtres), `garden_screen.dart` (ajout pièce/zone, glisser = déplacer, rond bas-droit = redimensionner, pincer/molette = zoom, glisser dans le vide = défiler, renommer, supprimer, portes/fenêtres : mur, position, largeur). 14 tests OK. Validé par l'utilisateur sur Linux.
 
+- Étape 3 (écrite, **non testée ici, à valider par l'utilisateur**) : catalogue `assets/plants_fr.json` (25 espèces FR, clé `image` = emoji ; une URL `http…` ou un chemin `assets/…` sera affiché comme image), copié au lancement dans `plant_species` sans écraser l'existant (`speciesCatalogProvider`). Écrans `lib/features/plants/` : liste « Mes plantes », catalogue avec recherche sans accents, fiche espèce, fiche plante (renommer, supprimer, placer/déplacer, retirer du plan). Placement : `placingPlantProvider` + onglet Jardin, appui sur une pièce/zone ; pastilles emoji déplaçables par glisser. Position des plantes relative au coin de leur pièce (elles suivent son déplacement). Dialogues communs : `lib/features/dialogs.dart`. 21 tests attendus.
+
 ## En attente de décision
 - Étape 4 : `flutter_local_notifications` ne marche pas sur le web ; sur iPhone les notifications PWA demandent Web Push (serveur). À trancher (alertes dans l'app seulement ?).
 - Étape 5 : `camera` web ne verrouille pas l'exposition ; mesure de lumière moins fiable sur iPhone, calibrage séparé.
@@ -18,4 +20,4 @@ Branche de travail : `claude/new-session-7hha19`.
 - Web hors-ligne complet : `flutter build web --no-web-resources-cdn` (sinon CanvasKit vient de gstatic).
 
 ## Prochaine étape
-Étape 3 : plantes (base locale JSON FR, fiche, ajout au jardin, placement sur le plan).
+Valider l'étape 3 chez l'utilisateur (`./scripts/dev.sh`), puis étape 4 : calendrier d'entretien (décision notifications à prendre).
