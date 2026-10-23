@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../data/providers.dart';
 import '../../models/plant.dart';
 import '../dialogs.dart';
+import 'online_search.dart';
 import 'plant_screen.dart';
 import 'species_view.dart';
 
@@ -19,7 +20,7 @@ String normalize(String s) {
   return buffer.toString();
 }
 
-/// Catalogue des espèces (base locale), avec recherche.
+/// Catalogue des espèces (base locale), avec recherche locale puis en ligne, et identification par photo.
 class CatalogScreen extends ConsumerStatefulWidget {
   const CatalogScreen({super.key});
 
@@ -35,7 +36,17 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final q = normalize(_query.trim());
     final species = ref.watch(speciesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Catalogue'), backgroundColor: Colors.transparent),
+      appBar: AppBar(
+        title: const Text('Catalogue'),
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            tooltip: 'Identifier par photo',
+            icon: const Icon(Icons.photo_camera),
+            onPressed: () => identifyFromPhoto(context, ref),
+          ),
+        ],
+      ),
       body: Column(children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -53,8 +64,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 for (final s in list)
                   if (normalize('${s.commonName} ${s.scientificName}').contains(q)) s,
               ];
-              if (found.isEmpty) return const Center(child: Text('Aucune espèce trouvée'));
               return ListView(children: [
+                if (found.isEmpty) const ListTile(title: Text('Aucune espèce dans le catalogue local')),
                 for (final s in found)
                   ListTile(
                     leading: SpeciesVisual(s),
@@ -62,6 +73,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     subtitle: Text(s.scientificName, style: const TextStyle(fontStyle: FontStyle.italic)),
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SpeciesScreen(species: s))),
                   ),
+                OnlineResults(query: _query),
               ]);
             },
           ),

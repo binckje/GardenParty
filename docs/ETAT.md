@@ -25,6 +25,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - `dev.sh` : web-server en HTTPS (certificat auto-signé dans `.dart_tool/dev_cert`), nécessaire à la caméra sur iPhone.
   - 35 tests OK (Flutter 3.47). Validé par l'utilisateur.
 - Étape 6 (couche données sans UI, choix utilisateur) : `lib/data/api/` (Perenual, GBIF, Pl@ntNet, cache SQLite, `PlantLookupService`), providers dans `providers.dart`, table `api_cache_entries` (schemaVersion 2). Clés dans `.env` (modèle `.env.example`), passées par `dev.sh`. 42 tests OK (7 nouveaux, réseau simulé). Non testé contre les vraies API (réseau du conteneur bloqué) : à valider par l'utilisateur. Wikipedia reporté.
+  - Écran (catalogue) : tuile « Chercher « … » en ligne » sous les résultats locaux (appel seulement au toucher, pour le quota), résultats Perenual → fiche chargée et enregistrée → fiche espèce (ajout au jardin). Bouton 📷 : `image_picker` (photo ou galerie ; galerie seule sur Linux) → Pl@ntNet → choix parmi 5 propositions → fiche. Fichier `lib/features/plants/online_search.dart`. 44 tests OK, build web OK.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -47,4 +48,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Afficher les emplacements conseillés (`LightAnalysis.bestSpots`) sur la fiche plante / espèce, et écran de recherche en ligne (nom / photo) branché sur `plantLookupProvider` dans le catalogue.
+Valider la recherche en ligne avec les vraies clés (Linux, puis iPhone pour la photo), puis afficher les emplacements conseillés (`LightAnalysis.bestSpots`) sur la fiche plante / espèce.
