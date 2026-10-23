@@ -29,6 +29,9 @@ git_sync() {
   target=${target:-$current}
   target=${target#origin/}
 
+  # Changements de droits seuls (disque NTFS/exFAT, chmod) : ignorés, sinon git croit à des modifications.
+  git config core.fileMode false
+
   # Fichiers non suivis ignorés : android/ linux/ web/ sont générés localement.
   if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
     warn "Modifications locales non commitées :"
@@ -73,7 +76,16 @@ prepare() {
   rm -f test/widget_test.dart
 
   step "Dépendances"
+  # pubspec.lock modifié depuis la dernière préparation : on repart propre,
+  # sinon les liens de plugins (linux/flutter/ephemeral) peuvent être périmés.
+  local stamp=.dart_tool/dev_pubspec_lock
+  local lock_hash; lock_hash=$(git hash-object pubspec.lock)
+  if [[ -f "$stamp" && "$(cat "$stamp")" != "$lock_hash" ]]; then
+    warn "pubspec.lock a changé : flutter clean"
+    flutter clean
+  fi
   flutter pub get
+  echo "$lock_hash" > "$stamp"
 
   web_assets
 
