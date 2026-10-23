@@ -7,14 +7,23 @@ import 'perenual_client.dart';
 import 'api_config.dart';
 import 'plantnet_client.dart';
 import 'species_mapper.dart';
+import 'tela_client.dart';
 
-/// Recherche de plantes en ligne : Perenual (entretien) + GBIF (noms FR), Pl@ntNet (photo).
+/// Recherche de plantes en ligne : Perenual (entretien) + GBIF (noms FR), Tela Botanica (écologie
+/// de la flore de France), Pl@ntNet (photo).
 /// Les fiches obtenues sont enregistrées en base locale.
 class PlantLookupService {
-  PlantLookupService({required this.perenual, required this.gbif, required this.plantnet, required this.plants});
+  PlantLookupService({
+    required this.perenual,
+    required this.gbif,
+    required this.tela,
+    required this.plantnet,
+    required this.plants,
+  });
 
   final PerenualClient perenual;
   final GbifClient gbif;
+  final TelaClient tela;
   final PlantNetClient plantnet;
   final PlantRepository plants;
 
@@ -50,7 +59,7 @@ class PlantLookupService {
   /// La fiche est enregistrée en base.
   Future<PlantSpecies> fetchHit(OnlineHit hit) => hit.fullSheet
       ? fetchSpecies(hit.perenualId!)
-      : speciesFromGbif(hit.scientificName, commonName: hit.commonName, gbifKey: hit.gbifKey);
+      : simplifiedSpecies(hit.scientificName, commonName: hit.commonName, gbifKey: hit.gbifKey);
 
   /// Charge la fiche complète, ajoute le nom français et l'enregistre en base.
   Future<PlantSpecies> fetchSpecies(int perenualId) async {
@@ -67,17 +76,36 @@ class PlantLookupService {
     return species;
   }
 
-  /// Fiche simplifiée : nom français GBIF (sinon [commonName]), entretien par défaut.
-  Future<PlantSpecies> speciesFromGbif(String scientificName, {String? commonName, int? gbifKey}) async {
-    final taxon = await gbif.match(scientificName);
+  /// Fiche sans Perenual : nom français GBIF (sinon [commonName]) ; entretien déduit du milieu
+  /// naturel si Tela Botanica connaît l'espèce (flore de France), sinon valeurs par défaut.
+  Future<PlantSpecies> simplifiedSpecies(String scientificName, {String? commonName, int? gbifKey}) async {
+    final taxon = await _orNull(() => gbif.match(scientificName));
     final key = taxon?.key ?? gbifKey;
-    if (key == null) throw ApiException('Espèce inconnue de GBIF : $scientificName.');
-    final frNames = await gbif.frenchNames(key);
+    final frNames = key == null ? const <String>[] : await _orNull(() => gbif.frenchNames(key)) ?? const <String>[];
     final canonical = taxon?.canonicalName ?? scientificName;
     final name = frNames.firstOrNull ?? (commonName == null || commonName.isEmpty ? canonical : commonName);
-    final species = gbifDefaultSpecies(gbifKey: key, scientificName: canonical, commonName: name);
+
+    final nn = await _orNull(() => tela.nameNumber(canonical));
+    final eco = nn == null ? null : await _orNull(() => tela.ecology(nn));
+    final PlantSpecies species;
+    if (eco != null) {
+      species = telaToSpecies(eco, nameNumber: nn!, scientificName: canonical, commonName: name);
+    } else if (key != null) {
+      species = gbifDefaultSpecies(gbifKey: key, scientificName: canonical, commonName: name);
+    } else {
+      throw ApiException('Espèce inconnue : $scientificName.');
+    }
     await plants.saveSpecies(species);
     return species;
+  }
+
+  /// Source d'enrichissement facultative : une panne n'empêche pas de créer la fiche.
+  static Future<T?> _orNull<T>(Future<T?> Function() call) async {
+    try {
+      return await call();
+    } on ApiException {
+      return null;
+    }
   }
 
   Future<List<PlantNetMatch>> identifyPhoto(List<Uint8List> images) => plantnet.identify(images);
@@ -96,7 +124,7 @@ class PlantLookupService {
       final exact = hits.where((h) => h.scientificName.toLowerCase() == match.scientificName.toLowerCase());
       return fetchSpecies((exact.firstOrNull ?? hits.first).id);
     }
-    return speciesFromGbif(match.scientificName, commonName: match.commonNames.firstOrNull, gbifKey: match.gbifKey);
+    return simplifiedSpecies(match.scientificName, commonName: match.commonNames.firstOrNull, gbifKey: match.gbifKey);
   }
 }
 

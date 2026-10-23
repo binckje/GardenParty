@@ -48,6 +48,57 @@ PlantSpecies gbifDefaultSpecies({required int gbifKey, required String scientifi
       fertilizing: const CareSchedule(everyDays: 30, quantity: 'Engrais liquide dilué de moitié'),
     );
 
+/// Préfixe d'identifiant des fiches déduites des indicateurs écologiques Tela Botanica.
+const telaSpeciesPrefix = 'tela-';
+
+/// Fiche de plante d'extérieur déduite du milieu naturel (Baseflor) : lumière d'Ellenberg (1–9),
+/// température (1–9), humidité du sol (1–12), réaction et nutriments du sol.
+PlantSpecies telaToSpecies(
+  Map<String, dynamic> eco, {
+  required int nameNumber,
+  required String scientificName,
+  required String commonName,
+}) {
+  int? code(String key) => int.tryParse('${eco['$key.code'] ?? ''}');
+  String? label(String key) {
+    final v = eco['$key.libelle'];
+    return v is String && v.trim().isNotEmpty ? v.trim() : null;
+  }
+
+  final light = code('ve_lumiere') ?? 5;
+  final temperature = code('ve_temperature') ?? 5;
+  final soilWater = code('ve_humidite_edaph') ?? 5;
+  final nutrients = code('ve_nutriments_sol') ?? 5;
+  final soil = [label('ve_reaction_sol'), label('ve_nutriments_sol')].whereType<String>().join(', ');
+  return PlantSpecies(
+    id: '$telaSpeciesPrefix$nameNumber',
+    scientificName: scientificName,
+    commonName: commonName,
+    light: switch (light) {
+      <= 2 => const [LightLevel.shade],
+      <= 4 => const [LightLevel.lowLight, LightLevel.brightIndirect],
+      <= 6 => const [LightLevel.brightIndirect, LightLevel.partialSun],
+      7 => const [LightLevel.partialSun, LightLevel.fullSun],
+      _ => const [LightLevel.fullSun],
+    },
+    minTempC: switch (temperature) { <= 3 => -25, <= 5 => -18, 6 => -12, 7 => -8, _ => -5 },
+    maxTempC: 35,
+    soil: soil.isEmpty ? 'Terre de jardin' : 'Sol $soil',
+    watering: switch (soilWater) {
+      <= 3 => const CareSchedule(everyDays: 21, quantity: 'Seulement en cas de sécheresse', activeMonths: [5, 6, 7, 8, 9]),
+      4 => const CareSchedule(everyDays: 10, quantity: 'Quand la terre est sèche en profondeur', activeMonths: [5, 6, 7, 8, 9]),
+      <= 6 => const CareSchedule(everyDays: 5, quantity: 'Quand le dessus de la terre est sec', activeMonths: [4, 5, 6, 7, 8, 9]),
+      <= 8 => const CareSchedule(everyDays: 3, quantity: 'Garder la terre fraîche', activeMonths: [4, 5, 6, 7, 8, 9]),
+      _ => const CareSchedule(everyDays: 2, quantity: 'Garder la terre humide en permanence', activeMonths: [4, 5, 6, 7, 8, 9]),
+    },
+    fertilizing: switch (nutrients) {
+      <= 3 => const CareSchedule(everyDays: 365, quantity: 'Aucun engrais : simplement valider', activeMonths: [3, 4, 5]),
+      <= 6 => const CareSchedule(everyDays: 365, quantity: 'Compost au pied', activeMonths: [3, 4, 5]),
+      _ => const CareSchedule(everyDays: 30, quantity: 'Engrais organique', activeMonths: [4, 5, 6, 7, 8]),
+    },
+  );
+}
+
 List<LightLevel> lightLevels(List<String> sunlight) {
   final levels = <LightLevel>{};
   for (final s in sunlight.map((s) => s.toLowerCase())) {

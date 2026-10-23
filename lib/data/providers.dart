@@ -13,6 +13,7 @@ import 'api/gbif_client.dart';
 import 'api/perenual_client.dart';
 import 'api/plant_lookup_service.dart';
 import 'api/plantnet_client.dart';
+import 'api/tela_client.dart';
 import 'db/database.dart';
 import 'repositories/care_repository.dart';
 import 'repositories/garden_repository.dart';
@@ -60,6 +61,7 @@ final plantLookupProvider = Provider((ref) {
   return PlantLookupService(
     perenual: PerenualClient(cache, keys.perenual),
     gbif: GbifClient(cache),
+    tela: TelaClient(cache),
     plantnet: PlantNetClient(ref.watch(httpClientProvider), keys.plantnet),
     plants: ref.watch(plantRepositoryProvider),
   );

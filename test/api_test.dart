@@ -12,6 +12,7 @@ import 'package:garden_party/data/api/perenual_client.dart';
 import 'package:garden_party/data/api/plant_lookup_service.dart';
 import 'package:garden_party/data/api/plantnet_client.dart';
 import 'package:garden_party/data/api/species_mapper.dart';
+import 'package:garden_party/data/api/tela_client.dart';
 import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/models/garden.dart';
@@ -46,6 +47,24 @@ Map<String, dynamic> _routes(Uri url) => switch (url.path) {
           'pest_susceptibility': ['Spider mites'],
           'indoor': true,
         },
+      '/service:eflore:0.1/bdtfx/noms' => url.queryParameters['masque'] == 'Lavandula angustifolia'
+          ? {
+              'entete': {'total': '1'},
+              'resultat': {
+                '38072': {'nom_sci': 'Lavandula angustifolia', 'retenu': 'true'},
+              },
+            }
+          : {'entete': {'total': 0}, 'resultat': []},
+      '/service:eflore:0.1/baseflor/informations/bdtfx.nn:38072' => {
+          'num_nomen': '38072',
+          've_lumiere.code': '8',
+          've_temperature.code': '6',
+          've_humidite_edaph.code': '4',
+          've_reaction_sol.libelle': 'basophiles (7,0<pH<7,5)',
+          've_nutriments_sol.libelle': 'méso-oligotrophiles',
+          've_nutriments_sol.code': '3',
+        },
+      '/v1/species/match' when url.queryParameters['name'] == 'Lavandula angustifolia' => {'matchType': 'NONE'},
       '/v1/species/match' => {
           'usageKey': 2868241,
           'matchType': 'EXACT',
@@ -202,11 +221,23 @@ void main() {
     final noKey = PlantLookupService(
       perenual: PerenualClient(container.read(apiCacheProvider), ''),
       gbif: GbifClient(container.read(apiCacheProvider)),
+      tela: TelaClient(container.read(apiCacheProvider)),
       plantnet: PlantNetClient(MockClient((_) async => http.Response('', 500)), ''),
       plants: container.read(plantRepositoryProvider),
     );
     final gbifHits = await noKey.searchByName('faux philodendron');
     expect(gbifHits.single.fullSheet, isFalse);
     expect(gbifHits.single.gbifKey, 2868241);
+  });
+
+  test('Tela Botanica : fiche écologique pour une espèce de la flore de France', () async {
+    final s = await container.read(plantLookupProvider).simplifiedSpecies('Lavandula angustifolia', commonName: 'Lavande');
+    expect(s.id, 'tela-38072');
+    expect(s.commonName, 'Lavande');
+    expect(s.light, [LightLevel.fullSun]);
+    expect(s.minTempC, -12);
+    expect(s.watering.everyDays, 10);
+    expect(s.fertilizing.quantity, startsWith('Aucun engrais'));
+    expect(s.soil, 'Sol basophiles (7,0<pH<7,5), méso-oligotrophiles');
   });
 }

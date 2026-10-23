@@ -9,6 +9,7 @@ import 'package:garden_party/data/api/gbif_client.dart';
 import 'package:garden_party/data/api/perenual_client.dart';
 import 'package:garden_party/data/api/plant_lookup_service.dart';
 import 'package:garden_party/data/api/plantnet_client.dart';
+import 'package:garden_party/data/api/tela_client.dart';
 import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/data/repositories/plant_repository.dart';
@@ -23,6 +24,7 @@ class _FakeLookup extends PlantLookupService {
       : super(
           perenual: PerenualClient(ApiCache(db, MockClient((_) async => http.Response('', 500))), 'k'),
           gbif: GbifClient(ApiCache(db, MockClient((_) async => http.Response('', 500)))),
+          tela: TelaClient(ApiCache(db, MockClient((_) async => http.Response('', 500)))),
           plantnet: PlantNetClient(MockClient((_) async => http.Response('', 500)), 'k'),
           plants: PlantRepository(db),
         );

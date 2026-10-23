@@ -82,6 +82,14 @@ class SpeciesDetails extends StatelessWidget {
                   'd\'intérieur, à vérifier.'),
             ),
           ),
+        if (s.id.startsWith(telaSpeciesPrefix))
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text('Fiche écologique (Tela Botanica)'),
+              subtitle: Text('Entretien déduit du milieu naturel de l\'espèce en France : à ajuster.'),
+            ),
+          ),
         _Section('☀️ Lumière', Wrap(spacing: 6, runSpacing: 4, children: [
           for (final l in s.light) Chip(label: Text(lightLabel(l)), visualDensity: VisualDensity.compact),
         ])),
