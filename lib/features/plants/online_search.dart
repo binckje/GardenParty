@@ -14,6 +14,19 @@ void _showError(BuildContext context, Object e) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
+/// Attente bloquante. Le dialogue vit sur le navigateur racine, pas sur celui de l'onglet :
+/// le fermer via `Navigator.of(context)` fermerait l'écran du catalogue à la place.
+VoidCallback _showSpinner(BuildContext context) {
+  final root = Navigator.of(context, rootNavigator: true);
+  showDialog<void>(
+    context: context,
+    useRootNavigator: true,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+  return root.pop;
+}
+
 /// Charge une fiche en ligne (attente bloquante) puis ouvre la fiche espèce.
 Future<void> openOnlineSpecies(
   BuildContext context,
@@ -21,11 +34,7 @@ Future<void> openOnlineSpecies(
   required String notFound,
 }) async {
   final nav = Navigator.of(context);
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const Center(child: CircularProgressIndicator()),
-  );
+  final closeSpinner = _showSpinner(context);
   PlantSpecies? species;
   Object? error;
   try {
@@ -33,7 +42,7 @@ Future<void> openOnlineSpecies(
   } catch (e) {
     error = e;
   }
-  nav.pop();
+  closeSpinner();
   if (!context.mounted) return;
   if (error != null) return _showError(context, error);
   if (species == null) {
@@ -142,21 +151,16 @@ Future<void> identifyFromPhoto(BuildContext context, WidgetRef ref) async {
   if (file == null || !context.mounted) return;
 
   final lookup = ref.read(plantLookupProvider);
-  final nav = Navigator.of(context);
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const Center(child: CircularProgressIndicator()),
-  );
+  final closeSpinner = _showSpinner(context);
   List<PlantNetMatch> matches;
   try {
     matches = await lookup.identifyPhoto([await file.readAsBytes()]);
   } catch (e) {
-    nav.pop();
+    closeSpinner();
     if (context.mounted) _showError(context, e);
     return;
   }
-  nav.pop();
+  closeSpinner();
   if (!context.mounted) return;
   if (matches.isEmpty) {
     ScaffoldMessenger.of(context)

@@ -13,6 +13,7 @@ import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/data/repositories/plant_repository.dart';
 import 'package:garden_party/features/plants/catalog_screen.dart';
+import 'package:garden_party/models/plant.dart';
 import 'package:http/testing.dart';
 import 'package:http/http.dart' as http;
 
@@ -28,6 +29,9 @@ class _FakeLookup extends PlantLookupService {
 
   final Future<List<PerenualHit>> Function(String) result;
   final queries = <String>[];
+
+  @override
+  Future<PlantSpecies> fetchSpecies(int perenualId) async => throw ApiException('Quota atteint sur perenual.com.');
 
   @override
   Future<List<PerenualHit>> searchByName(String query) {
@@ -48,7 +52,10 @@ void main() {
         speciesProvider.overrideWith((ref) => Stream.value(const [])),
         plantLookupProvider.overrideWithValue(lookup),
       ],
-      child: const MaterialApp(home: CatalogScreen()),
+      // Navigateur imbriqué, comme l'onglet Plantes sous go_router.
+      child: MaterialApp(
+        home: Navigator(onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => const CatalogScreen())),
+      ),
     ));
     await tester.pump();
     return lookup;
@@ -77,5 +84,21 @@ void main() {
     await tester.tap(find.text('Chercher « rose » en ligne'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Quota journalier'), findsOneWidget);
+  });
+
+  testWidgets('échec du chargement d\'une fiche : attente fermée, catalogue toujours affiché', (tester) async {
+    await pumpCatalog(
+      tester,
+      (_) async => const [PerenualHit(id: 42, commonName: 'swiss cheese plant', scientificName: 'Monstera deliciosa')],
+    );
+    await tester.enterText(find.byType(TextField), 'monstera');
+    await tester.pump();
+    await tester.tap(find.text('Chercher « monstera » en ligne'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('swiss cheese plant'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Catalogue'), findsOneWidget);
+    expect(find.text('Quota atteint sur perenual.com.'), findsOneWidget);
   });
 }

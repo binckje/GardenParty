@@ -37,7 +37,7 @@ class ApiCache {
     }
     if (res.statusCode != 200) {
       if (cached != null) return jsonDecode(cached.body);
-      throw ApiException(_errorMessage(res.statusCode, url.host), statusCode: res.statusCode);
+      throw ApiException(_errorMessage(res.statusCode, url.host, res.body), statusCode: res.statusCode);
     }
     final body = utf8.decode(res.bodyBytes);
     final decoded = jsonDecode(body);
@@ -52,9 +52,15 @@ class ApiCache {
       (_db.delete(_db.apiCacheEntries)..where((c) => c.fetchedAt.isSmallerThanValue(_now().subtract(maxAge)))).go();
 }
 
-String _errorMessage(int status, String host) => switch (status) {
-      401 || 403 => 'Clé API refusée par $host.',
-      404 => 'Plante introuvable sur $host.',
-      429 => 'Quota journalier atteint sur $host, réessaie demain.',
-      _ => 'Erreur $status de $host.',
-    };
+/// Message pour l'UI, suivi de la réponse du service (tronquée) pour le diagnostic.
+String _errorMessage(int status, String host, String body) {
+  final base = switch (status) {
+    401 || 403 => 'Clé API refusée par $host.',
+    404 => 'Plante introuvable sur $host.',
+    429 => 'Quota atteint sur $host.',
+    _ => 'Erreur $status de $host.',
+  };
+  final detail = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (detail.isEmpty) return base;
+  return '$base ($status : ${detail.length > 160 ? '${detail.substring(0, 160)}…' : detail})';
+}
