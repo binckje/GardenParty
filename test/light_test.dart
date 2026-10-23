@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garden_party/features/garden/plan_geometry.dart';
 import 'package:garden_party/features/light/light_analysis.dart';
 import 'package:garden_party/features/light/light_meter.dart';
 import 'package:garden_party/models/garden.dart';
@@ -50,6 +51,15 @@ void main() {
     final best = LightAnalysis.bestSpots([room], [LightLevel.brightIndirect, LightLevel.partialSun]);
     expect([for (final b in best) b.spot.position], [const Offset(1, 1), const Offset(3, 2)]);
     expect(LightAnalysis.bestSpots([room], [LightLevel.fullSun]), isEmpty);
+  });
+
+  test('points hors de la pièce ignorés ; les mesures suivent la pièce déplacée', () {
+    final room = _room([_r('a', 1, 1, DayMoment.noon, 3000), _r('b', 6, 1, DayMoment.noon, 3000)]);
+    expect(LightAnalysis.bestSpots([room], [LightLevel.brightIndirect]), hasLength(1));
+    final moved = room.copy();
+    PlanGeometry.move(moved, origin: const Offset(0, 0), delta: const Offset(2, 0.5));
+    expect([for (final r in moved.lightReadings) Offset(r.x, r.y)], [const Offset(3, 1.5), const Offset(8, 1.5)]);
+    expect(room.lightReadings.first.x, 1);
   });
 
   test('moment de la journée selon l\'heure', () {

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/providers.dart';
 import '../../models/plant.dart';
 import '../dialogs.dart';
+import '../light/suggested_spots.dart';
 import 'species_view.dart';
 
 /// Ouvre le plan en mode placement pour cette plante.
@@ -97,6 +98,7 @@ class PlantScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          if (species != null) SuggestedSpots(plant: plant, species: species),
           if (species != null) SpeciesDetails(species),
         ],
       ),

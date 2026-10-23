@@ -51,12 +51,16 @@ class LightAnalysis {
   /// Le point convient si son niveau médian fait partie des besoins de la plante.
   static bool suits(List<LightLevel> needs, LightSpot spot) => needs.contains(spot.medianLevel);
 
-  /// Points adaptés, les mieux renseignés (plus de moments mesurés) d'abord.
+  /// Le point est dans la pièce (bords compris).
+  static bool inside(Space s, Offset p) =>
+      p.dx >= s.x && p.dx <= s.x + s.width && p.dy >= s.y && p.dy <= s.y + s.height;
+
+  /// Points adaptés (dans leur pièce), les mieux renseignés (plus de moments mesurés) d'abord.
   static List<SpotSuggestion> bestSpots(List<Space> spaces, List<LightLevel> needs) {
     final result = [
       for (final space in spaces)
         for (final spot in spots(space))
-          if (suits(needs, spot)) (space: space, spot: spot),
+          if (inside(space, spot.position) && suits(needs, spot)) (space: space, spot: spot),
     ];
     result.sort((a, b) => b.spot.byMoment.length.compareTo(a.spot.byMoment.length));
     return result;

@@ -32,10 +32,26 @@ class PlanGeometry {
 
   static bool onHandle(Space s, Offset p, double tolerance) => (handleOf(s) - p).distance <= tolerance;
 
+  /// Déplace la pièce ; ses mesures de lumière (en coordonnées du plan) la suivent.
   static void move(Space s, {required Offset origin, required Offset delta}) {
+    final x = max(0.0, snap(origin.dx + delta.dx)), y = max(0.0, snap(origin.dy + delta.dy));
+    final dx = x - s.x, dy = y - s.y;
+    if ((dx != 0 || dy != 0) && s.lightReadings.isNotEmpty) {
+      s.lightReadings = [
+        for (final r in s.lightReadings)
+          LightReading(
+            id: r.id,
+            x: r.x + dx,
+            y: r.y + dy,
+            moment: r.moment,
+            estimatedLux: r.estimatedLux,
+            takenAt: r.takenAt,
+          ),
+      ];
+    }
     s
-      ..x = max(0, snap(origin.dx + delta.dx))
-      ..y = max(0, snap(origin.dy + delta.dy));
+      ..x = x
+      ..y = y;
   }
 
   static void resize(Space s, {required Size origin, required Offset delta}) {
