@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:garden_party/data/garden_repository.dart';
+import 'package:garden_party/data/repositories/garden_repository.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/features/garden/garden_screen.dart';
 import 'package:garden_party/models/garden.dart';
