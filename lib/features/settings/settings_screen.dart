@@ -2,10 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/providers.dart';
 import '../../services/google/google_auth.dart';
 import '../calendar/care_service.dart';
-import 'demo_data.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -84,20 +82,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           ],
-          const _Header('Données'),
-          ListTile(
-            leading: const Icon(Icons.local_florist_outlined),
-            title: const Text('Ajouter des plantes de démo'),
-            subtitle: const Text('Monstera et basilic, pour essayer le calendrier.'),
-            onTap: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final care = ref.read(careServiceProvider);
-              await addDemoPlants(ref.read(plantRepositoryProvider));
-              final n = await care.ensureTasks();
-              await care.refreshAlerts();
-              messenger.showSnackBar(SnackBar(content: Text('$n soin(s) ajouté(s) au calendrier.')));
-            },
-          ),
         ],
       ),
     );

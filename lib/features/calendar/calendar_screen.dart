@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers.dart';
 import '../../models/care.dart';
 import '../../services/google/google_auth.dart';
-import '../settings/demo_data.dart';
 import 'care_planner.dart';
 import 'care_service.dart';
 
@@ -146,13 +145,13 @@ class _TaskTile extends ConsumerWidget {
   }
 }
 
-class _Empty extends ConsumerWidget {
+class _Empty extends StatelessWidget {
   const _Empty({required this.hasPlants});
 
   final bool hasPlants;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -161,22 +160,10 @@ class _Empty extends ConsumerWidget {
           children: [
             const Text('💧', style: TextStyle(fontSize: 64)),
             const SizedBox(height: 16),
-            Text(hasPlants ? 'Rien à faire pour le moment.' : 'Ajoute des plantes pour voir leurs soins ici.',
-                textAlign: TextAlign.center),
-            if (!hasPlants) ...[
-              const SizedBox(height: 16),
-              OutlinedButton(
-                onPressed: () async {
-                  // Lus avant d'attendre : ce widget disparaît dès que les tâches arrivent.
-                  final plants = ref.read(plantRepositoryProvider);
-                  final care = ref.read(careServiceProvider);
-                  await addDemoPlants(plants);
-                  await care.ensureTasks();
-                  await care.refreshAlerts();
-                },
-                child: const Text('Ajouter des plantes de démo'),
-              ),
-            ],
+            Text(
+              hasPlants ? 'Rien à faire pour le moment.' : 'Ajoute des plantes (onglet Plantes) pour voir leurs soins ici.',
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/router.dart';
 import 'app/theme.dart';
+import 'data/providers.dart';
 import 'features/calendar/care_service.dart';
 
 Future<void> main() async {
@@ -17,11 +18,13 @@ Future<void> main() async {
   ));
 }
 
-class GardenPartyApp extends StatelessWidget {
+class GardenPartyApp extends ConsumerWidget {
   const GardenPartyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Remplit le catalogue d'espèces en arrière-plan au premier lancement.
+    ref.watch(speciesCatalogProvider);
     return MaterialApp.router(
       title: 'GardenParty',
       debugShowCheckedModeBanner: false,
@@ -73,5 +76,9 @@ class _CareAlertsState extends ConsumerState<CareAlerts> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    // Plante ajoutée, renommée ou supprimée : ses soins et les rappels suivent.
+    ref.listen(ownedPlantsProvider, (_, __) => _tick());
+    return widget.child;
+  }
 }

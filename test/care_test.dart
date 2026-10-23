@@ -11,7 +11,6 @@ import 'package:garden_party/features/calendar/calendar_screen.dart';
 import 'package:garden_party/features/calendar/care_planner.dart';
 import 'package:garden_party/features/calendar/care_service.dart';
 import 'package:garden_party/features/calendar/ics_export.dart';
-import 'package:garden_party/features/settings/demo_data.dart';
 import 'package:garden_party/models/care.dart';
 import 'package:garden_party/models/garden.dart';
 import 'package:garden_party/models/plant.dart';
@@ -155,19 +154,22 @@ void main() {
     tearDown(() => container.dispose());
 
     test('valider un soin prévoit le suivant', () async {
-      await addDemoPlants(container.read(plantRepositoryProvider));
+      final plants = container.read(plantRepositoryProvider);
+      await plants.saveSpecies(_species);
+      await plants.saveOwnedPlant(_plant);
+      await plants.saveOwnedPlant(OwnedPlant(id: 'p2', speciesId: 'sp', nickname: 'Basilic 2'));
       final care = container.read(careServiceProvider);
       expect(await care.ensureTasks(), 4);
       expect(await care.ensureTasks(), 0);
       final repo = container.read(careRepositoryProvider);
       final watering = (await repo.watchPending().first)
-          .firstWhere((t) => t.plantId == 'demo-p2' && t.type == CareType.watering);
+          .firstWhere((t) => t.plantId == 'p2' && t.type == CareType.watering);
       final at = DateTime(2026, 7, 1, 8);
       await care.complete(watering, at: at);
       final next = (await repo.watchPending().first)
-          .firstWhere((t) => t.plantId == 'demo-p2' && t.type == CareType.watering);
+          .firstWhere((t) => t.plantId == 'p2' && t.type == CareType.watering);
       expect(next.id, isNot(watering.id));
-      expect(next.dueAt, DateTime(2026, 7, 3, careHour));
+      expect(next.dueAt, DateTime(2026, 7, 7, careHour));
     });
 
     testWidgets('écran : soin en retard affiché puis validé', (tester) async {
