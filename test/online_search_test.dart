@@ -78,7 +78,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(lookup.queries, ['monstera']);
     expect(find.text('swiss cheese plant'), findsOneWidget);
-    expect(find.text('Monstera deliciosa'), findsOneWidget);
+    expect(find.text('Monstera deliciosa · Perenual'), findsOneWidget);
   });
 
   testWidgets('erreur API affichée en français', (tester) async {

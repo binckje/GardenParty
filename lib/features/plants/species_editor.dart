@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/api/species_mapper.dart';
+
 import '../../data/providers.dart';
 import '../../models/garden.dart';
 import '../../models/plant.dart';
@@ -80,7 +82,7 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
       return;
     }
     final species = PlantSpecies(
-      id: widget.initial?.id ?? 'perso-${const Uuid().v4()}',
+      id: widget.initial?.id ?? '$customSpeciesPrefix${const Uuid().v4()}',
       scientificName: _scientific.text.trim(),
       commonName: _common.text.trim(),
       imageUrl: _image,

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../data/api/species_mapper.dart';
@@ -121,6 +122,7 @@ class SpeciesDetails extends StatelessWidget {
                 children: [Text('Cause : ${d.cause}'), Text('Remède : ${d.treatment}')],
               ),
           ])),
+        _SourceSection(speciesSource(s.id)),
       ],
     );
   }
@@ -134,6 +136,31 @@ class SpeciesDetails extends StatelessWidget {
             ? 'en ${_months[c.activeMonths.single - 1]}'
             : 'de ${_months[c.activeMonths.first - 1]} à ${_months[c.activeMonths.last - 1]}';
     return 'Tous les ${c.everyDays} jours, ${c.quantity} ($months)';
+  }
+}
+
+class _SourceSection extends StatelessWidget {
+  const _SourceSection(this.source);
+
+  final ({String label, Uri? url}) source;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = source.url;
+    return _Section(
+      '📚 Source',
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(source.label),
+        if (url != null)
+          InkWell(
+            onTap: () => launchUrl(url, mode: LaunchMode.externalApplication),
+            child: Text(
+              url.toString(),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary, decoration: TextDecoration.underline),
+            ),
+          ),
+      ]),
+    );
   }
 }
 

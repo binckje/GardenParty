@@ -8,7 +8,7 @@ PlantSpecies perenualToSpecies(Map<String, dynamic> j, {String? frenchName, Stri
   final hardinessMin = _usdaZone(j['hardiness']?['min']);
   final indoor = j['indoor'] == true;
   return PlantSpecies(
-    id: 'perenual-${j['id']}',
+    id: '$perenualSpeciesPrefix${j['id']}',
     scientificName: scientificName ?? PerenualClient.firstScientificName(j['scientific_name']),
     commonName: frenchName ?? _capitalize((j['common_name'] as String?) ?? ''),
     imageUrl: PerenualClient.imageUrl(j['default_image']),
@@ -32,6 +32,7 @@ PlantSpecies perenualToSpecies(Map<String, dynamic> j, {String? frenchName, Stri
 
 /// Préfixe d'identifiant des fiches simplifiées (GBIF + valeurs par défaut), à ajuster par l'utilisateur.
 const gbifSpeciesPrefix = 'gbif-';
+const perenualSpeciesPrefix = 'perenual-';
 
 /// Fiche simplifiée quand Perenual n'a pas de fiche gratuite : nom et taxonomie GBIF,
 /// entretien moyen de plante d'intérieur.
@@ -50,6 +51,31 @@ PlantSpecies gbifDefaultSpecies({required int gbifKey, required String scientifi
 
 /// Préfixe d'identifiant des fiches déduites des indicateurs écologiques Tela Botanica.
 const telaSpeciesPrefix = 'tela-';
+
+/// Fiches créées dans l'éditeur.
+const customSpeciesPrefix = 'perso-';
+
+/// Origine d'une fiche, déduite de son identifiant.
+({String label, Uri? url}) speciesSource(String id) {
+  String rest(String prefix) => id.substring(prefix.length);
+  if (id.startsWith(perenualSpeciesPrefix)) {
+    return (
+      label: 'Perenual (entretien), noms français GBIF',
+      url: Uri.parse('https://perenual.com/plant-species-database-search-finder/species/${rest(perenualSpeciesPrefix)}'),
+    );
+  }
+  if (id.startsWith(telaSpeciesPrefix)) {
+    return (
+      label: 'Tela Botanica, baseflor (écologie), noms français GBIF',
+      url: Uri.parse('https://www.tela-botanica.org/bdtfx-nn-${rest(telaSpeciesPrefix)}'),
+    );
+  }
+  if (id.startsWith(gbifSpeciesPrefix)) {
+    return (label: 'GBIF (noms), entretien par défaut', url: Uri.parse('https://www.gbif.org/species/${rest(gbifSpeciesPrefix)}'));
+  }
+  if (id.startsWith(customSpeciesPrefix)) return (label: 'Fiche personnelle', url: null);
+  return (label: 'Catalogue GardenParty', url: null);
+}
 
 /// Fiche de plante d'extérieur déduite du milieu naturel (Baseflor) : lumière d'Ellenberg (1–9),
 /// température (1–9), humidité du sol (1–12), réaction et nutriments du sol.

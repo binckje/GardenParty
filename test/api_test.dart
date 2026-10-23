@@ -265,4 +265,12 @@ void main() {
     expect(s.fertilizing.quantity, startsWith('Aucun engrais'));
     expect(s.soil, 'Sol basophiles (7,0<pH<7,5), méso-oligotrophiles');
   });
+
+  test('source de la fiche déduite de son identifiant', () {
+    expect(speciesSource('perenual-42').url.toString(), endsWith('/species/42'));
+    expect(speciesSource('tela-38072').label, startsWith('Tela Botanica'));
+    expect(speciesSource('gbif-2868241').url.toString(), 'https://www.gbif.org/species/2868241');
+    expect(speciesSource('perso-abc').label, 'Fiche personnelle');
+    expect(speciesSource('monstera').url, isNull);
+  });
 }
