@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden_party/data/repositories/garden_repository.dart';
+import 'package:garden_party/data/repositories/plant_repository.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/features/garden/garden_screen.dart';
 import 'package:garden_party/features/light/light_measure_sheet.dart';
 import 'package:garden_party/models/garden.dart';
+import 'package:garden_party/models/plant.dart';
 
 class _FakeRepo implements GardenRepository {
   final saved = <Space>[];
 
   @override
   Future<void> saveSpace(Space s) async => saved.add(s.copy());
+
+  @override
+  dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
+}
+
+class _FakePlantRepo implements PlantRepository {
+  final saved = <OwnedPlant>[];
+
+  @override
+  Future<void> saveOwnedPlant(OwnedPlant p) async => saved.add(p.copy());
 
   @override
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
@@ -25,6 +37,8 @@ void main() {
       overrides: [
         spacesProvider.overrideWith((ref) => Stream.value([salon])),
         gardenRepositoryProvider.overrideWithValue(repo),
+        ownedPlantsProvider.overrideWith((ref) => Stream.value(const [])),
+        speciesProvider.overrideWith((ref) => Stream.value(const [])),
       ],
       child: const MaterialApp(home: GardenScreen()),
     ));
@@ -44,6 +58,39 @@ void main() {
     expect(repo.saved.last.y, 1);
   });
 
+  testWidgets('mode placement : un appui pose la plante dans la pièce touchée', (tester) async {
+    final plants = _FakePlantRepo();
+    final salon = Space(id: 's', name: 'Salon', kind: SpaceKind.indoorRoom, x: 1, y: 1, width: 4, height: 3);
+    final momo = OwnedPlant(id: 'p', speciesId: 'monstera', nickname: 'Momo');
+    final container = ProviderContainer(overrides: [
+      spacesProvider.overrideWith((ref) => Stream.value([salon])),
+      ownedPlantsProvider.overrideWith((ref) => Stream.value([momo])),
+      speciesProvider.overrideWith((ref) => Stream.value(const [])),
+      plantRepositoryProvider.overrideWithValue(plants),
+    ]);
+    addTearDown(container.dispose);
+    container.read(placingPlantProvider.notifier).state = 'p';
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(home: GardenScreen()),
+    ));
+    await tester.pump();
+    expect(find.byKey(const Key('placing')), findsOneWidget);
+
+    final plan = tester.getTopLeft(find.byKey(const Key('plan')));
+    // Hors pièce : rien n'est enregistré, le mode placement continue.
+    await tester.tapAt(plan + const Offset(24 + 8 * 40, 24 + 8 * 40));
+    await tester.pump();
+    expect(plants.saved, isEmpty);
+
+    await tester.tapAt(plan + const Offset(24 + 2 * 40, 24 + 3 * 40));
+    await tester.pump();
+    expect(plants.saved.single.spaceId, 's');
+    expect(plants.saved.single.x, closeTo(1, 0.01));
+    expect(plants.saved.single.y, closeTo(2, 0.01));
+    expect(container.read(placingPlantProvider), isNull);
+  });
+
   testWidgets('mode lumière : toucher une pièce enregistre une mesure', (tester) async {
     final repo = _FakeRepo();
     final salon = Space(id: 's', name: 'Salon', kind: SpaceKind.indoorRoom, x: 1, y: 1, width: 4, height: 3);
@@ -52,6 +99,8 @@ void main() {
       overrides: [
         spacesProvider.overrideWith((ref) => Stream.value([salon])),
         gardenRepositoryProvider.overrideWithValue(repo),
+        ownedPlantsProvider.overrideWith((ref) => Stream.value(const [])),
+        speciesProvider.overrideWith((ref) => Stream.value(const [])),
         lightMeasureProvider.overrideWithValue((context, moment) async {
           asked = moment;
           return 1500;

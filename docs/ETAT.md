@@ -4,19 +4,50 @@ Branche de travail : `claude/new-session-7hha19`.
 
 ## Fait
 - Étape 0 : squelette Flutter, thème, navigation 4 onglets, modèles.
-- Étape 1 : base drift (`lib/data/db/`), repositories garden/plant/care, providers Riverpod (`lib/data/providers.dart`). 7 tests OK chez l'utilisateur (CachyOS, Flutter ≥ 3.38).
+- Étape 1 : base drift (`lib/data/db/`), repositories garden/plant/care, providers Riverpod (`lib/data/providers.dart`).
 - `scripts/dev.sh` : git → préparation → tests → lancement (linux, chrome, web-server pour iPhone).
-- Web drift : `web/` versionné (index.html, manifest en FR, couleurs du thème). `sqlite3.wasm` et `drift_worker.js` téléchargés par `dev.sh` (étape préparation) selon les versions de `pubspec.lock`, non versionnés. Vérifié dans Chromium : stockage IndexedDB, plan conservé après rechargement.
-- Étape 2 : éditeur du plan (`lib/features/garden/`) : `plan_geometry.dart` (calculs, aimantation 0,25 m, taille mini 0,5 m), `plan_painter.dart` (grille 1 m, pièces au-dessus des zones, portes avec arc, fenêtres), `garden_screen.dart` (ajout pièce/zone, glisser = déplacer, rond bas-droit = redimensionner, pincer/molette = zoom, glisser dans le vide = défiler, renommer, supprimer, portes/fenêtres : mur, position, largeur). 14 tests OK. Validé par l'utilisateur sur Linux.
+- Web drift : `web/` versionné. `sqlite3.wasm` et `drift_worker.js` téléchargés par `dev.sh` selon `pubspec.lock`, non versionnés.
+- Étape 2 : éditeur du plan (`lib/features/garden/`). Validé par l'utilisateur sur Linux.
+- Étape 3 : catalogue `assets/plants_fr.json` (25 espèces FR, clé `image` = emoji ; une URL `http…` ou un chemin `assets/…` sera affiché comme image), copié au lancement dans `plant_species` sans écraser l'existant (`speciesCatalogProvider`). Écrans `lib/features/plants/` : liste « Mes plantes », catalogue avec recherche sans accents, fiche espèce, fiche plante (renommer, supprimer, placer/déplacer, retirer du plan). Placement : `placingPlantProvider` + onglet Jardin, appui sur une pièce/zone ; pastilles emoji déplaçables par glisser. Position des plantes relative au coin de leur pièce (elles suivent son déplacement). Dialogues communs : `lib/features/dialogs.dart`. 20 tests OK. Validé par l'utilisateur sur Linux.
+- Étape 4 : calendrier des soins.
+  - `lib/features/calendar/` : `care_planner.dart` (génération des tâches, intervalle doublé hors saison), `care_service.dart` (validation, alertes, synchro, providers), `ics_export.dart`, écran (En retard / Aujourd'hui / À venir, bouton « Fait ✓ », export .ics 90 jours).
+  - Soins créés automatiquement quand une plante est ajoutée (`CareAlerts` dans `main.dart` écoute `ownedPlantsProvider`), puis au démarrage, au retour dans l'app et toutes les 15 min.
+  - Pastille du nombre de soins dus sur l'onglet Calendrier.
+  - `lib/services/care_notifications.dart` : Android = rappels programmés à 9 h ; Linux = rappel à l'ouverture ; web = idem, à activer dans Réglages (autorisation navigateur).
+  - `lib/services/google/` : synchro vers un agenda dédié « GardenParty 🌱 » (portée `calendar.app.created`). Linux/Android : client OAuth « bureau » + retour 127.0.0.1, jeton stocké. Web : `http://localhost:8080` seulement, jeton 1 h.
+  - Réglages : notifications, Google Agenda (connecter / synchroniser / déconnecter).
+  - `scripts/patch_android.py` : desugaring + récepteurs de notifications dans `android/` (appelé par `dev.sh`). `dev.sh` passe `google_oauth.env` en `--dart-define-from-file` et fixe le port 8080 pour chrome.
+  - 29 tests OK (Flutter 3.47). Build web vérifié dans Chromium. Builds Linux/Android non testés ici (pas de GTK ni SDK Android).
+- Étape 5 : lumière (`lib/features/light/`).
+  - Bouton ☀️ de l'écran Jardin = mode lumière : moment (matin / midi / fin d'après-midi, présélectionné selon l'heure) ou « Bilan » (niveau médian par point). Toucher une pièce = mesurer ; toucher un point existant = détail des 3 moments, nouvelle mesure, suppression. Carte de chaleur colorée par niveau + légende.
+  - Sources : capteur (Android, paquet `light`), caméra (Android/web : luminance moyenne × facteur de calibrage dans `SharedPreferences`), saisie (5 repères qualitatifs ou lux d'un luxmètre). Pas de caméra sur Linux.
+  - `LightAnalysis.bestSpots(spaces, species.light)` : emplacements conseillés, pas encore affichés.
+  - `dev.sh` : web-server en HTTPS (certificat auto-signé dans `.dart_tool/dev_cert`), nécessaire à la caméra sur iPhone.
+  - 35 tests OK (Flutter 3.47). Pas testé sur appareil réel ici.
 
-- Étape 5 : lumière (`lib/features/light/`). Bouton ☀️ de l'écran Jardin = mode lumière : choix du moment (matin/midi/fin d'après-midi) ou « Bilan » (niveau médian), toucher une pièce = mesurer, toucher un point existant = détail/nouvelle mesure/suppression ; carte de chaleur colorée par niveau + légende. Sources : capteur (Android), caméra (Android/web, calibrage stocké en base, table `settings`, schéma v2), saisie (repères ou lux). `LightAnalysis.bestSpots` prêt pour les suggestions (UI à faire avec l'étape 3). `dev.sh` : web-server en HTTPS auto-signé (caméra iPhone). 21 tests OK ici (Flutter 3.38+ compatible : `camera` < 0.12, `camera_platform_interface` < 2.15). **À valider par l'utilisateur** (Android, Linux, iPhone).
+## Tests à faire (étape 5)
+1. `./scripts/dev.sh` → 1 (pubspec.lock a changé).
+2. Linux : Jardin → ☀️ → choisir « Midi » → toucher une pièce → onglet « Saisie » → choisir un repère : tache colorée + lux. Toucher le point : détail, re-mesurer, supprimer. « Bilan » : couleur = niveau médian.
+3. Android : onglet « Capteur » (téléphone à plat) ; onglet « Caméra » → « Calibrer » (valeur du capteur pré-remplie) puis « Mesurer ».
+4. iPhone : `dev.sh` → lancement 3, ouvrir l'URL **https**, accepter le certificat, autoriser la caméra ; « Calibrer » avec un repère puis « Mesurer ».
+
+## Tests reportés (étape 4)
+Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
+1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
+2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
+3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
+4. Google Agenda (facultatif) : suivre `google_oauth.env.example`, créer `google_oauth.env`, relancer, Réglages → « Connecter Google Agenda » → agenda « GardenParty 🌱 » visible dans Google Agenda.
+5. Android : notification à 9 h le jour d'un soin, même app fermée.
 
 ## En attente de décision
-- Étape 4 : `flutter_local_notifications` ne marche pas sur le web ; sur iPhone les notifications PWA demandent Web Push (serveur). À trancher (alertes dans l'app seulement ?).
+- Caméra en exposition automatique (aucune plateforme n'expose ISO / temps de pose via `camera`) : estimation grossière, préférer capteur ou saisie.
+- Google sur iPhone : impossible depuis `http://<ip>` (Google exige https ou localhost). Contournement : synchro depuis Linux/Android, l'iPhone voit l'agenda via le compte Google ; sinon héberger le web en HTTPS (ex. GitHub Pages).
 
 ## Points d'attention
-- Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter (`linux/flutter/ephemeral/.plugin_symlinks`) cassent le build Linux.
-- Web hors-ligne complet : `flutter build web --no-web-resources-cdn` (sinon CanvasKit vient de gstatic).
+- Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter cassent le build Linux.
+- Web hors-ligne complet : `flutter build web --no-web-resources-cdn`.
+- Écran de consentement Google en mode « Test » : jeton de rafraîchissement valable 7 jours, reconnecter ensuite.
+- Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Étape 3 : plantes (base locale JSON FR, fiche, ajout au jardin, placement sur le plan).
+Afficher les emplacements conseillés (`LightAnalysis.bestSpots`) sur la fiche plante / espèce, puis étape 6 : API.

@@ -37,14 +37,6 @@ void main() {
   });
   tearDown(() => container.dispose());
 
-  test('réglages : valeur absente puis enregistrée et remplacée', () async {
-    final repo = container.read(settingsRepositoryProvider);
-    expect(await repo.getDouble('k'), isNull);
-    await repo.setDouble('k', 1.5);
-    await repo.setDouble('k', 2500);
-    expect(await repo.getDouble('k'), 2500);
-  });
-
   test('pièce sauvegardée avec ouvertures et mesures', () async {
     final repo = container.read(gardenRepositoryProvider);
     await repo.saveSpace(Space(

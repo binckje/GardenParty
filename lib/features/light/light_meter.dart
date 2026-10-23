@@ -45,7 +45,7 @@ const dayMomentLabels = {
 
 /// Sources de mesure : capteur (Android), caméra calibrée, saisie manuelle.
 class LightMeter {
-  /// Clé du facteur de calibrage caméra (lux par unité de luminance) dans les réglages.
+  /// Clé du facteur de calibrage caméra (lux par unité de luminance) (SharedPreferences).
   static const calibrationKey = 'camera_lux_factor';
 
   /// Facteur par défaut, très approximatif : une image moyenne (luminance 0,2) ≈ 400 lx.

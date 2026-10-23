@@ -7,6 +7,10 @@ import 'package:uuid/uuid.dart';
 
 import '../../data/providers.dart';
 import '../../models/garden.dart';
+import '../../models/plant.dart';
+import '../dialogs.dart';
+import '../plants/plant_screen.dart';
+import '../plants/species_view.dart';
 import '../light/light_analysis.dart';
 import '../light/light_measure_sheet.dart';
 import '../light/light_meter.dart';
@@ -16,10 +20,9 @@ import 'plan_painter.dart';
 const _uuid = Uuid();
 const _walls = ['Haut', 'Droite', 'Bas', 'Gauche'];
 
-enum _Drag { none, pan, move, resize }
+enum _Drag { none, pan, move, resize, plant }
 
-/// Éditeur du plan vu de dessus : pièces, zones, portes et fenêtres.
-/// En mode lumière : mesures par point et carte de chaleur.
+/// Éditeur du plan vu de dessus : pièces, zones, portes, fenêtres et plantes.
 class GardenScreen extends ConsumerStatefulWidget {
   const GardenScreen({super.key});
 
@@ -38,6 +41,10 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
   /// Copie en cours d'édition, affichée à la place de la version enregistrée.
   Space? _draft;
 
+  /// Plante en cours de glisser et sa position absolue provisoire.
+  OwnedPlant? _draggedPlant;
+  Offset _plantPos = Offset.zero;
+
   // État du geste en cours.
   _Drag _drag = _Drag.none;
   Offset _startFocal = Offset.zero;
@@ -52,6 +59,8 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
     final saved = ref.read(spacesProvider).valueOrNull ?? const [];
     return [for (final s in saved) s.id == _draft?.id ? _draft! : s];
   }
+
+  List<OwnedPlant> _plants() => ref.read(ownedPlantsProvider).valueOrNull ?? const [];
 
   Space? get _selected => _spaces().where((s) => s.id == _selectedId).firstOrNull;
 
@@ -73,11 +82,21 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
     _startFocal = d.pointerCount == 1 ? _downPos ?? d.localFocalPoint : d.localFocalPoint;
     _startView = _view;
     _drag = _Drag.pan;
-    if (d.pointerCount > 1 || _light) return;
+    // En mode placement ou lumière, glisser fait seulement défiler le plan.
+    if (d.pointerCount > 1 || _light || ref.read(placingPlantProvider) != null) return;
     final p = _view.toWorld(_startFocal);
     final selected = _selected;
     if (selected != null && PlanGeometry.onHandle(selected, p, PlanPainter.handleRadius * 2 / _view.scale)) {
       _beginEdit(selected, _Drag.resize);
+      return;
+    }
+    final plant = PlanGeometry.plantAt(_plants(), _spaces(), p, PlanPainter.plantRadius / _view.scale);
+    if (plant != null) {
+      setState(() {
+        _draggedPlant = plant.copy();
+        _plantPos = _startPos = PlanGeometry.plantPosition(plant, _spaces())!;
+        _drag = _Drag.plant;
+      });
       return;
     }
     final hit = PlanGeometry.spaceAt(_spaces(), p);
@@ -110,6 +129,8 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
           PlanGeometry.move(_draft!, origin: _startPos, delta: delta);
         case _Drag.resize:
           PlanGeometry.resize(_draft!, origin: _startSize, delta: delta);
+        case _Drag.plant:
+          _plantPos = _startPos + delta;
         case _Drag.pan:
           _view = _zoomed(_startView, _startFocal, d.localFocalPoint, d.scale);
         case _Drag.none:
@@ -120,6 +141,15 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
 
   void _onScaleEnd(ScaleEndDetails d) {
     if ((_drag == _Drag.move || _drag == _Drag.resize) && _draft != null) _save(_draft!);
+    if (_drag == _Drag.plant) {
+      final plant = _draggedPlant!;
+      // Lâchée hors de toute pièce/zone : elle revient à sa place.
+      if (PlanGeometry.placePlant(plant, _spaces(), _plantPos)) {
+        ref.read(plantRepositoryProvider).saveOwnedPlant(plant);
+      } else {
+        setState(() => _draggedPlant = null);
+      }
+    }
     _drag = _Drag.none;
   }
 
@@ -137,11 +167,22 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
 
   void _onTapUp(TapUpDetails d) {
     final p = _view.toWorld(d.localPosition);
-    final hit = PlanGeometry.spaceAt(_spaces(), p);
-    if (_light) {
-      if (hit != null) _tapLight(hit, p);
+    final placingId = ref.read(placingPlantProvider);
+    if (placingId != null) {
+      _placeAt(placingId, p);
       return;
     }
+    if (_light) {
+      final space = PlanGeometry.spaceAt(_spaces(), p);
+      if (space != null) _tapLight(space, p);
+      return;
+    }
+    final plant = PlanGeometry.plantAt(_plants(), _spaces(), p, PlanPainter.plantRadius / _view.scale);
+    if (plant != null) {
+      _showPlant(plant);
+      return;
+    }
+    final hit = PlanGeometry.spaceAt(_spaces(), p);
     setState(() => _selectedId = hit?.id);
   }
 
@@ -204,9 +245,55 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
       ]);
   }
 
+  Future<void> _placeAt(String plantId, Offset p) async {
+    final plant = _plants().where((x) => x.id == plantId).firstOrNull?.copy();
+    if (plant == null) {
+      ref.read(placingPlantProvider.notifier).state = null;
+      return;
+    }
+    if (!PlanGeometry.placePlant(plant, _spaces(), p)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Touche une pièce ou une zone')));
+      return;
+    }
+    ref.read(placingPlantProvider.notifier).state = null;
+    await ref.read(plantRepositoryProvider).saveOwnedPlant(plant);
+  }
+
+  Future<void> _showPlant(OwnedPlant p) {
+    final species = ref.read(speciesProvider).valueOrNull?.where((s) => s.id == p.speciesId).firstOrNull;
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (c) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(leading: SpeciesVisual(species), title: Text(p.nickname), subtitle: Text(species?.commonName ?? '')),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Voir la fiche'),
+            onTap: () {
+              Navigator.pop(c);
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlantScreen(plantId: p.id)));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.close),
+            title: const Text('Retirer du plan'),
+            onTap: () {
+              Navigator.pop(c);
+              ref.read(plantRepositoryProvider).saveOwnedPlant(p.copy()
+                ..spaceId = null
+                ..x = null
+                ..y = null);
+            },
+          ),
+        ]),
+      ),
+    );
+  }
+
   Future<void> _addSpace(SpaceKind kind, Size viewport) async {
     final indoor = kind == SpaceKind.indoorRoom;
-    final name = await _askName(context,
+    final name = await askName(context,
         title: indoor ? 'Nouvelle pièce' : 'Nouvelle zone', initial: indoor ? 'Salon' : 'Terrasse');
     if (name == null) return;
     final center = _view.toWorld(viewport.center(Offset.zero));
@@ -224,23 +311,18 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
   }
 
   Future<void> _rename(Space s) async {
-    final name = await _askName(context, title: 'Renommer', initial: s.name);
+    final name = await askName(context, title: 'Renommer', initial: s.name);
     if (name != null) _edit((s) => s.name = name);
   }
 
   Future<void> _delete(Space s) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: Text('Supprimer « ${s.name} » ?'),
-        content: const Text('Ses portes, fenêtres et mesures de lumière seront supprimées.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuler')),
-          FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Supprimer')),
-        ],
-      ),
+    final ok = await confirm(
+      context,
+      title: 'Supprimer « ${s.name} » ?',
+      message: 'Ses portes, fenêtres et mesures de lumière seront supprimées. Ses plantes deviendront non placées.',
+      action: 'Supprimer',
     );
-    if (ok != true) return;
+    if (!ok) return;
     await ref.read(gardenRepositoryProvider).deleteSpace(s.id);
     setState(() {
       _selectedId = null;
@@ -334,9 +416,23 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
       // La base a enregistré la modification : la copie locale n'est plus utile.
       if (next.hasValue && _drag == _Drag.none) setState(() => _draft = null);
     });
+    ref.listen(ownedPlantsProvider, (_, next) {
+      if (next.hasValue && _drag == _Drag.none) setState(() => _draggedPlant = null);
+    });
     final async = ref.watch(spacesProvider);
     final spaces = _spaces();
-    final selected = _selected;
+    final plants = ref.watch(ownedPlantsProvider).valueOrNull ?? const <OwnedPlant>[];
+    final species = {for (final s in ref.watch(speciesProvider).valueOrNull ?? const <PlantSpecies>[]) s.id: s};
+    final placingId = ref.watch(placingPlantProvider);
+    final placing = plants.where((p) => p.id == placingId).firstOrNull;
+    final selected = placing == null ? _selected : null;
+    final planPlants = [
+      for (final p in plants)
+        if (p.id == _draggedPlant?.id)
+          PlanPlant(id: p.id, emoji: speciesEmoji(species[p.speciesId]), position: _plantPos)
+        else if (PlanGeometry.plantPosition(p, spaces) case final pos?)
+          PlanPlant(id: p.id, emoji: speciesEmoji(species[p.speciesId]), position: pos),
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -376,8 +472,16 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
                   onScaleUpdate: _onScaleUpdate,
                   onScaleEnd: _onScaleEnd,
                   child: CustomPaint(
-                      painter: PlanPainter(
-                          spaces: spaces, view: _view, selectedId: _selectedId, light: _light, moment: _moment)),
+                    painter: PlanPainter(
+                      spaces: spaces,
+                      view: _view,
+                      selectedId: selected?.id,
+                      plants: planPlants,
+                      draggedPlantId: _draggedPlant?.id,
+                      light: _light,
+                      moment: _moment,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -387,21 +491,37 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
               const IgnorePointer(
                 child: Center(child: Text('🌱\nAjoute ta première pièce ou zone', textAlign: TextAlign.center)),
               ),
-            if (_light) Positioned(left: 12, right: 12, bottom: 12, child: _lightPanel()),
-            if (!_light)
-              Positioned(
-                right: 16,
-                bottom: 16,
-                child: selected == null
-                    ? FloatingActionButton.extended(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Ajouter'),
-                        onPressed: () => _chooseKind(viewport),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: selected == null && placing == null && !_light
+                  ? FloatingActionButton.extended(
+                      icon: const Icon(Icons.add),
+                      label: const Text('Ajouter'),
+                      onPressed: () => _chooseKind(viewport),
+                    )
+                  : const SizedBox.shrink(),
+            ),
             if (selected != null && !_light)
               Positioned(left: 12, right: 12, bottom: 12, child: _selectionPanel(selected)),
+            if (_light && placing == null) Positioned(left: 12, right: 12, bottom: 12, child: _lightPanel()),
+            if (placing != null)
+              Positioned(
+                left: 12,
+                right: 12,
+                top: 12,
+                child: Card(
+                  key: const Key('placing'),
+                  child: ListTile(
+                    leading: SpeciesVisual(species[placing.speciesId], size: 32),
+                    title: Text('Touche le plan pour poser « ${placing.nickname} »'),
+                    trailing: TextButton(
+                      onPressed: () => ref.read(placingPlantProvider.notifier).state = null,
+                      child: const Text('Annuler'),
+                    ),
+                  ),
+                ),
+              ),
           ],
         );
       }),
@@ -502,33 +622,13 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
               ]),
               const Padding(
                 padding: EdgeInsets.only(top: 4),
-                child: Text('Glisse pour déplacer, tire le rond pour redimensionner.', style: TextStyle(fontSize: 12)),
+                child: Text(
+                  'Glisse pour déplacer, tire le rond pour redimensionner. Les plantes se glissent aussi.',
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
             ],
           ),
         ),
       );
-}
-
-Future<String?> _askName(BuildContext context, {required String title, required String initial}) {
-  final controller = TextEditingController(text: initial);
-  return showDialog<String>(
-    context: context,
-    builder: (c) => AlertDialog(
-      title: Text(title),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        decoration: const InputDecoration(labelText: 'Nom'),
-        onSubmitted: (v) => Navigator.pop(c, v.trim().isEmpty ? null : v.trim()),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(c), child: const Text('Annuler')),
-        FilledButton(
-          onPressed: () => Navigator.pop(c, controller.text.trim().isEmpty ? null : controller.text.trim()),
-          child: const Text('OK'),
-        ),
-      ],
-    ),
-  );
 }

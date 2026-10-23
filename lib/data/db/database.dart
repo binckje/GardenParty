@@ -9,7 +9,7 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Spaces, Openings, LightReadings, PlantSpeciesTable, OwnedPlants, CareTasks, Settings])
+@DriftDatabase(tables: [Spaces, Openings, LightReadings, PlantSpeciesTable, OwnedPlants, CareTasks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -22,13 +22,10 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onUpgrade: (m, from, to) async {
-          if (from < 2) await m.createTable(settings);
-        },
         beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
       );
 }

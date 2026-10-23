@@ -97,13 +97,3 @@ class CareTasks extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
-
-/// Réglages de l'app en clé/valeur (ex. calibrage de la caméra).
-@DataClassName('SettingRow')
-class Settings extends Table {
-  TextColumn get key => text()();
-  TextColumn get value => text()();
-
-  @override
-  Set<Column> get primaryKey => {key};
-}

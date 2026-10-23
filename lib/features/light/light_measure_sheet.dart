@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/providers.dart';
+import '../calendar/care_service.dart' show prefsProvider;
 import '../../models/garden.dart';
 import 'light_meter.dart';
 
@@ -154,7 +154,7 @@ class _CameraMeasureState extends ConsumerState<_CameraMeasure> {
 
   Future<void> _init() async {
     try {
-      final saved = await ref.read(settingsRepositoryProvider).getDouble(LightMeter.calibrationKey);
+      final saved = ref.read(prefsProvider).getDouble(LightMeter.calibrationKey);
       final cameras = await availableCameras();
       if (cameras.isEmpty) throw 'aucune caméra';
       final camera =
@@ -205,7 +205,7 @@ class _CameraMeasureState extends ConsumerState<_CameraMeasure> {
     final lux = await _askReferenceLux(context);
     if (lux == null) return;
     final factor = lux / y;
-    await ref.read(settingsRepositoryProvider).setDouble(LightMeter.calibrationKey, factor);
+    await ref.read(prefsProvider).setDouble(LightMeter.calibrationKey, factor);
     setState(() {
       _factor = factor;
       _calibrated = true;
