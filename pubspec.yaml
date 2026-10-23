@@ -7,6 +7,9 @@ environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
+  # Caméra (mesure de lumière). Bornes : rester compatible Flutter 3.38 (0.12 / 2.15 exigent plus récent).
+  camera: '>=0.11.0 <0.12.0'
+  camera_platform_interface: '>=2.13.0 <2.15.0'
   drift: ^2.35.2
   drift_flutter: ^0.3.1
   flutter:
@@ -14,11 +17,12 @@ dependencies:
   flutter_riverpod: ^2.5.1
   go_router: ^14.2.0
   google_fonts: ^6.2.1
+  # Capteur de luminosité (Android).
+  light: ^5.0.0
   uuid: ^4.4.0
   # Prévus pour les étapes suivantes (voir docs/ROADMAP.md) :
   # flutter_local_notifications: ^17.2.1
   # table_calendar: ^3.1.2
-  # camera: ^0.11.0
   # http: ^1.2.1
 
 dev_dependencies:

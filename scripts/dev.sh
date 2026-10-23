@@ -142,8 +142,18 @@ launch() {
   fi
   if [[ "$device" == web-server ]]; then
     local ip; ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($i=="src") print $(i+1)}')
-    echo "Ouvre http://${ip:-<ip-du-pc>}:8080 sur l'iPhone/iPad (même Wi-Fi)."
-    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080
+    # HTTPS obligatoire pour la caméra sur iPhone : certificat auto-signé (Safari demandera de l'accepter).
+    local cert=.dart_tool/dev_cert
+    if [[ ! -f "$cert/cert.pem" ]]; then
+      command -v openssl >/dev/null || die "openssl introuvable (nécessaire pour le HTTPS de la caméra)"
+      mkdir -p "$cert"
+      openssl req -x509 -newkey rsa:2048 -nodes -days 825 -subj "/CN=GardenParty dev" \
+        -keyout "$cert/key.pem" -out "$cert/cert.pem" 2>/dev/null
+      ok "Certificat de dev créé ($cert)"
+    fi
+    echo "Ouvre https://${ip:-<ip-du-pc>}:8080 sur l'iPhone/iPad (même Wi-Fi), puis accepte le certificat."
+    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 \
+      --web-tls-cert-path "$cert/cert.pem" --web-tls-cert-key-path "$cert/key.pem"
   else
     flutter run -d "$device"
   fi
