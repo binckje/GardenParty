@@ -38,7 +38,10 @@ class CareNotifications {
 
   bool get _isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
-  bool get supported => kIsWeb || defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.linux;
+  /// Web : API Notification absente sur iPhone hors app ajoutée à l'écran d'accueil (iOS 16.4+).
+  bool get supported => kIsWeb
+      ? WebFlutterLocalNotificationsPlugin.isSupported
+      : defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.linux;
 
   /// Web : l'autorisation ne peut être demandée que sur un geste, donc désactivé tant que l'utilisateur n'a pas activé.
   bool get enabled => _prefs.getBool(_enabledKey) ?? !kIsWeb;
@@ -74,6 +77,7 @@ class CareNotifications {
   }
 
   /// Demande l'autorisation (Android 13+, navigateur). Linux n'en demande pas.
+  /// Web : reste désactivé si le service worker ne démarre pas (ex. certificat HTTPS non reconnu) ou si refusé.
   Future<bool> setEnabled(bool on) async {
     await _prefs.setBool(_enabledKey, on);
     if (!on) {
@@ -81,15 +85,23 @@ class CareNotifications {
       return true;
     }
     await init();
+    if (kIsWeb) {
+      var granted = false;
+      try {
+        granted = _ready &&
+            (await _plugin
+                    .resolvePlatformSpecificImplementation<WebFlutterLocalNotificationsPlugin>()
+                    ?.requestNotificationsPermission() ??
+                false);
+      } catch (e) {
+        debugPrint('Autorisation impossible : $e');
+      }
+      if (!granted) await _prefs.setBool(_enabledKey, false);
+      return granted;
+    }
     if (_isAndroid) {
       return await _plugin
               .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-              ?.requestNotificationsPermission() ??
-          false;
-    }
-    if (kIsWeb) {
-      return await _plugin
-              .resolvePlatformSpecificImplementation<WebFlutterLocalNotificationsPlugin>()
               ?.requestNotificationsPermission() ??
           false;
     }

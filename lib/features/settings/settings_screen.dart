@@ -33,7 +33,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           SwitchListTile(
             title: const Text('Notifications des soins'),
             subtitle: Text(!notifications.supported
-                ? 'Non disponibles sur cet appareil : les retards restent signalés dans l\'app.'
+                ? kIsWeb
+                    ? 'Non disponibles dans ce navigateur. iPhone : ajouter l\'app à l\'écran d\'accueil '
+                        '(Partager > Sur l\'écran d\'accueil), puis l\'ouvrir depuis l\'icône. '
+                        'Les retards restent signalés dans l\'app.'
+                    : 'Non disponibles sur cet appareil : les retards restent signalés dans l\'app.'
                 : defaultTargetPlatform == TargetPlatform.android && !kIsWeb
                     ? 'Rappel à l\'heure de chaque soin, même app fermée.'
                     : 'Rappel des soins dus à l\'ouverture de l\'app (pas de rappel app fermée).'),
@@ -43,12 +47,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 : (on) async {
                     final messenger = ScaffoldMessenger.of(context);
                     final care = ref.read(careServiceProvider);
-                    final granted = await notifications.setEnabled(on);
-                    if (on && !granted) {
-                      messenger.showSnackBar(const SnackBar(content: Text('Autorisation refusée par le système.')));
+                    try {
+                      final granted = await notifications.setEnabled(on);
+                      if (on && !granted) {
+                        messenger.showSnackBar(const SnackBar(
+                          content: Text(kIsWeb
+                              ? 'Notifications refusées ou impossibles (le navigateur exige un HTTPS reconnu).'
+                              : 'Autorisation refusée par le système.'),
+                        ));
+                      }
+                      if (on && granted) await care.refreshAlerts();
+                    } catch (e) {
+                      messenger.showSnackBar(SnackBar(content: Text('Notifications impossibles : $e')));
+                    } finally {
+                      if (mounted) setState(() {});
                     }
-                    if (on) await care.refreshAlerts();
-                    if (mounted) setState(() {});
                   },
           ),
           const _Header('Google Agenda'),
