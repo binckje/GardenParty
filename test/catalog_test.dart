@@ -17,10 +17,10 @@ List<PlantSpecies> _catalog() => [
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
-  test('base locale : 25 espèces valides, identifiants uniques', () {
+  test('base locale : 260 espèces valides, identifiants uniques', () {
     final species = _catalog();
-    expect(species, hasLength(25));
-    expect(species.map((s) => s.id).toSet(), hasLength(25));
+    expect(species, hasLength(260));
+    expect(species.map((s) => s.id).toSet(), hasLength(260));
     for (final s in species) {
       expect(s.light, isNotEmpty, reason: s.id);
       expect(s.minTempC, lessThan(s.maxTempC), reason: s.id);
@@ -48,7 +48,7 @@ void main() {
     ));
 
     await repo.addMissingSpecies(species);
-    expect(await repo.watchSpecies().first, hasLength(25));
+    expect(await repo.watchSpecies().first, hasLength(260));
     expect((await repo.getSpecies(edited.id))!.commonName, 'Modifiée');
   });
 
