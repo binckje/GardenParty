@@ -30,6 +30,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - Éditeur de fiche (`lib/features/plants/species_editor.dart`) : bouton « Créer une fiche » du catalogue (id `perso-<uuid>`) et « Modifier » sur toute fiche espèce (id conservé ; une fiche du catalogue modifiée n'est plus écrasée par `addMissingSpecies`). Tous les champs ; photo (appareil/galerie, 600 px) stockée en data URI dans `imageUrl`, ou emoji. 51 tests OK.
   - Recherche de bases alternatives (réseau bloqué ici, recherche web seulement) : Trefle actif à nouveau (dépôt mis à jour en oct. 2026, jeton gratuit) ; Tela Botanica eFlore/baseflor (sans clé, indicateurs écologiques de la flore de France, API parfois en panne) ; API plantes d'intérieur (Zyla, Apify) payantes ; Plants For A Future sans API. Tests curl de l'utilisateur : Trefle abandonné (données `growth` toutes à null, même pour la lavande). Tela : `https://api.tela-botanica.org/service:eflore:0.1/bdtfx/noms?masque=<nom>&retour.format=min` marche (lavande = nn 38072) ; données baseflor : identifiant au format `bdtfx.nn:<nn>` (deux-points), ex. `https://api.tela-botanica.org/service:eflore:0.1/baseflor/informations/bdtfx.nn:73259` ; liste : `baseflor/informations?navigation.depart=0&navigation.limite=1` (8006 taxons). Intégré : `tela_client.dart` (nom → nn via `bdtfx/noms`, puis `?categorie=ecologie`) ; sans fiche Perenual gratuite, `simplifiedSpecies` essaie Tela (fiche `tela-<nn>`, lumière d'Ellenberg, température, humidité du sol, pH/nutriments, bandeau « Fiche écologique ») puis GBIF par défaut. 52 tests OK (réseau simulé). Non vérifié : CORS de Tela sur le web.
 - Emplacements conseillés sur les fiches plante et espèce (voir étape 5). 55 tests OK. Validé par l'utilisateur sur Linux.
+- Sauvegarde/export (avancé depuis l'étape 7) : `lib/data/backup.dart` (`BackupService`, `backupServiceProvider`) exporte en JSON les lignes brutes des tables utilisateur (pièces, ouvertures, mesures, fiches espèces avec photos, plantes, soins ; pas le cache API), avec `app`, `format: 1`, `schemaVersion`. La restauration remplace tout dans une transaction (rien ne change si le fichier est invalide ou vient d'un schéma plus récent), puis rafraîchit les alertes. Réglages, section « Sauvegarde » : export via `file_saver` (comme le .ics), import via `file_picker` 13 (Linux : portail XDG). 57 tests OK, build web OK. À valider par l'utilisateur.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -40,11 +41,19 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 5. Android : notification à 9 h le jour d'un soin, même app fermée.
 
 
+## Test à faire : sauvegarde
+1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique), cible Linux.
+2. Réglages → « Exporter mes données » → noter le chemin affiché, ouvrir le JSON (tables `spaces`, `owned_plants`…).
+3. Supprimer une plante ou une pièce, puis Réglages → « Restaurer une sauvegarde » → confirmer → choisir le fichier : la plante/pièce revient, calendrier à jour.
+4. Restaurer un fichier quelconque (ex. le .ics) : message d'erreur, données inchangées.
+5. Web/iPhone : l'export télécharge le fichier ; la restauration ouvre le sélecteur de fichiers.
+
 ## En attente de décision
 - Caméra en exposition automatique (aucune plateforme n'expose ISO / temps de pose via `camera`) : estimation grossière, préférer capteur ou saisie.
 - Google sur iPhone : impossible depuis `http://<ip>` (Google exige https ou localhost). Contournement : synchro depuis Linux/Android, l'iPhone voit l'agenda via le compte Google ; sinon héberger le web en HTTPS (ex. GitHub Pages).
 
 ## Points d'attention
+- Sauvegarde : si une future migration renomme ou transforme des colonnes, convertir les anciennes sauvegardes dans `BackupService.importJson` (les colonnes absentes prennent leur valeur par défaut).
 - Premier build après changement de `pubspec.lock` : `sqlite3` télécharge SQLite depuis GitHub ; en cas de « Connection reset by peer », relancer.
 - Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter cassent le build Linux.
 - Web hors-ligne complet : `flutter build web --no-web-resources-cdn`.

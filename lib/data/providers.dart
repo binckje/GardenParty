@@ -14,6 +14,7 @@ import 'api/perenual_client.dart';
 import 'api/plant_lookup_service.dart';
 import 'api/plantnet_client.dart';
 import 'api/tela_client.dart';
+import 'backup.dart';
 import 'db/database.dart';
 import 'repositories/care_repository.dart';
 import 'repositories/garden_repository.dart';
@@ -29,6 +30,7 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 final gardenRepositoryProvider = Provider((ref) => GardenRepository(ref.watch(databaseProvider)));
 final plantRepositoryProvider = Provider((ref) => PlantRepository(ref.watch(databaseProvider)));
 final careRepositoryProvider = Provider((ref) => CareRepository(ref.watch(databaseProvider)));
+final backupServiceProvider = Provider((ref) => BackupService(ref.watch(databaseProvider)));
 
 final spacesProvider = StreamProvider<List<Space>>((ref) => ref.watch(gardenRepositoryProvider).watchSpaces());
 final speciesProvider = StreamProvider<List<PlantSpecies>>((ref) => ref.watch(plantRepositoryProvider).watchSpecies());

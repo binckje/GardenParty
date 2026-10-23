@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/backup.dart';
+import '../../data/providers.dart';
 import '../../services/google/google_auth.dart';
 import '../calendar/care_service.dart';
 
@@ -82,10 +88,74 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           ],
+          const _Header('Sauvegarde'),
+          ListTile(
+            leading: const Icon(Icons.upload_file),
+            title: const Text('Exporter mes données'),
+            subtitle: const Text('Fichier JSON : plan, mesures, fiches, plantes et soins.'),
+            onTap: _export,
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore),
+            title: const Text('Restaurer une sauvegarde'),
+            subtitle: const Text('Remplace toutes les données actuelles.'),
+            onTap: _import,
+          ),
         ],
       ),
     );
   }
+
+  Future<void> _export() async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final json = await ref.read(backupServiceProvider).exportJson();
+      final now = DateTime.now();
+      final path = await FileSaver.instance.saveFile(
+        name: 'gardenparty-${now.year}-${_two(now.month)}-${_two(now.day)}',
+        bytes: utf8.encode(json),
+        fileExtension: 'json',
+        mimeType: MimeType.json,
+      );
+      messenger.showSnackBar(SnackBar(content: Text('Sauvegarde enregistrée : $path')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Export impossible : $e')));
+    }
+  }
+
+  Future<void> _import() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Restaurer une sauvegarde ?'),
+        content: const Text('Toutes les données actuelles seront remplacées par celles du fichier.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Restaurer')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      final file = await FilePicker.pickFile(
+        dialogTitle: 'Choisir une sauvegarde',
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      if (file == null) return;
+      final bytes = await file.xFile.readAsBytes();
+      await ref.read(backupServiceProvider).importJson(utf8.decode(bytes));
+      await ref.read(careServiceProvider).refreshAlerts();
+      messenger.showSnackBar(const SnackBar(content: Text('Sauvegarde restaurée 🌱')));
+    } on BackupException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Restauration impossible : $e')));
+    }
+  }
+
+  static String _two(int n) => n.toString().padLeft(2, '0');
 
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')} ${d.hour}h${d.minute.toString().padLeft(2, '0')}';
