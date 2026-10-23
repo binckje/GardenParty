@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import '../../models/garden.dart';
+import '../../models/plant.dart';
 
 /// Calculs du plan (en mètres), indépendants de l'affichage.
 class PlanGeometry {
@@ -31,10 +32,26 @@ class PlanGeometry {
 
   static bool onHandle(Space s, Offset p, double tolerance) => (handleOf(s) - p).distance <= tolerance;
 
+  /// Déplace la pièce ; ses mesures de lumière (en coordonnées du plan) la suivent.
   static void move(Space s, {required Offset origin, required Offset delta}) {
+    final x = max(0.0, snap(origin.dx + delta.dx)), y = max(0.0, snap(origin.dy + delta.dy));
+    final dx = x - s.x, dy = y - s.y;
+    if ((dx != 0 || dy != 0) && s.lightReadings.isNotEmpty) {
+      s.lightReadings = [
+        for (final r in s.lightReadings)
+          LightReading(
+            id: r.id,
+            x: r.x + dx,
+            y: r.y + dy,
+            moment: r.moment,
+            estimatedLux: r.estimatedLux,
+            takenAt: r.takenAt,
+          ),
+      ];
+    }
     s
-      ..x = max(0, snap(origin.dx + delta.dx))
-      ..y = max(0, snap(origin.dy + delta.dy));
+      ..x = x
+      ..y = y;
   }
 
   static void resize(Space s, {required Size origin, required Offset delta}) {
@@ -73,5 +90,39 @@ class PlanGeometry {
     final o = Opening(id: id, kind: kind, wall: wall, offset: snap((wallLen - length) / 2), length: length);
     clampOpening(s, o);
     return o;
+  }
+
+  /// Position absolue d'une plante placée, gardée dans sa pièce/zone ; null si non placée.
+  static Offset? plantPosition(OwnedPlant p, List<Space> spaces) {
+    final s = spaces.where((s) => s.id == p.spaceId).firstOrNull;
+    if (s == null || p.x == null || p.y == null) return null;
+    return Offset(s.x + p.x!.clamp(0, s.width), s.y + p.y!.clamp(0, s.height));
+  }
+
+  /// Plante la plus proche du point, dans la tolérance.
+  static OwnedPlant? plantAt(List<OwnedPlant> plants, List<Space> spaces, Offset p, double tolerance) {
+    OwnedPlant? best;
+    var bestDistance = tolerance;
+    for (final plant in plants) {
+      final pos = plantPosition(plant, spaces);
+      if (pos == null) continue;
+      final d = (pos - p).distance;
+      if (d <= bestDistance) {
+        best = plant;
+        bestDistance = d;
+      }
+    }
+    return best;
+  }
+
+  /// Pose la plante au point [p], rattachée à la pièce/zone dessous ; false si le point est hors plan.
+  static bool placePlant(OwnedPlant plant, List<Space> spaces, Offset p) {
+    final s = spaceAt(spaces, p);
+    if (s == null) return false;
+    plant
+      ..spaceId = s.id
+      ..x = p.dx - s.x
+      ..y = p.dy - s.y;
+    return true;
   }
 }

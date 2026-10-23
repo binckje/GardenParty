@@ -74,6 +74,8 @@ prepare() {
   fi
   # Test généré par défaut par flutter create, référence MyApp inexistant.
   rm -f test/widget_test.dart
+  # Notifications programmées : desugaring, permissions et récepteurs dans android/ (généré).
+  [[ -d android ]] && python3 scripts/patch_android.py
 
   step "Dépendances"
   # pubspec.lock modifié depuis la dernière préparation : on repart propre,
@@ -88,6 +90,7 @@ prepare() {
   echo "$lock_hash" > "$stamp"
 
   web_assets
+  api_keys
 
   step "Code généré (drift)"
   local gen=lib/data/db/database.g.dart
@@ -119,6 +122,20 @@ web_assets() {
   ok "Téléchargés : sqlite3.wasm $sqlite, drift_worker.js $drift"
 }
 
+# Clés API (Perenual, Pl@ntNet) : fichier .env non versionné, passé à flutter run.
+api_keys() {
+  step "Clés API"
+  if [[ ! -f .env ]]; then
+    cp .env.example .env
+    warn ".env créé depuis .env.example : renseigne PERENUAL_KEY et PLANTNET_KEY (recherche en ligne désactivée sinon)"
+    return 0
+  fi
+  local k
+  for k in PERENUAL_KEY PLANTNET_KEY; do
+    if grep -qE "^$k=.+" .env; then ok "$k renseignée"; else warn "$k vide dans .env"; fi
+  done
+}
+
 run_checks() {
   step "Analyse"
   flutter analyze || { ask "Analyse en échec, continuer ?" || exit 1; }
@@ -126,8 +143,21 @@ run_checks() {
   flutter test || { ask "Tests en échec, continuer ?" || exit 1; }
 }
 
+# Fichiers de --dart-define non versionnés : identifiants OAuth Google Agenda et clés API (facultatifs).
+google_defines() {
+  DEFINES=()
+  if [[ -f google_oauth.env ]]; then
+    DEFINES+=(--dart-define-from-file=google_oauth.env)
+  else
+    warn "google_oauth.env absent : synchro Google Agenda désactivée (voir google_oauth.env.example)"
+  fi
+  [[ -f .env ]] && DEFINES+=(--dart-define-from-file=.env)
+  return 0
+}
+
 launch() {
   local device=${1:-}
+  google_defines
   if [[ -z "$device" ]]; then
     step "Lancement"
     echo "  1) linux   2) chrome   3) web-server (iPhone/iPad sur le réseau local)   4) autre appareil"
@@ -142,10 +172,24 @@ launch() {
   fi
   if [[ "$device" == web-server ]]; then
     local ip; ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($i=="src") print $(i+1)}')
-    echo "Ouvre http://${ip:-<ip-du-pc>}:8080 sur l'iPhone/iPad (même Wi-Fi)."
-    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080
+    # HTTPS obligatoire pour la caméra sur iPhone : certificat auto-signé (Safari demande de l'accepter).
+    local cert=.dart_tool/dev_cert
+    if [[ ! -f "$cert/cert.pem" ]]; then
+      command -v openssl >/dev/null || die "openssl introuvable (nécessaire pour le HTTPS de la caméra)"
+      mkdir -p "$cert"
+      openssl req -x509 -newkey rsa:2048 -nodes -days 825 -subj "/CN=GardenParty dev" \
+        -keyout "$cert/key.pem" -out "$cert/cert.pem" 2>/dev/null
+      ok "Certificat de dev créé ($cert)"
+    fi
+    echo "Ouvre https://${ip:-<ip-du-pc>}:8080 sur l'iPhone/iPad (même Wi-Fi), puis accepte le certificat."
+    echo "(Connexion Google impossible depuis une adresse IP : utilise l'export .ics ou la synchro depuis Linux/Android.)"
+    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 "${DEFINES[@]}" \
+      --web-tls-cert-path "$cert/cert.pem" --web-tls-cert-key-path "$cert/key.pem"
+  elif [[ "$device" == chrome ]]; then
+    # Port fixe : http://localhost:8080 doit être déclaré comme origine JavaScript du client OAuth web.
+    flutter run -d chrome --web-port 8080 "${DEFINES[@]}"
   else
-    flutter run -d "$device"
+    flutter run -d "$device" "${DEFINES[@]}"
   fi
 }
 
@@ -160,7 +204,7 @@ main() {
   echo "${c_info}GardenParty — dev${c_off}"
   echo "  1) Tout : git → préparation → tests → lancement"
   echo "  2) Git seulement"
-  echo "  3) Préparation (plateformes, pub get, fichiers web drift, génération drift)"
+  echo "  3) Préparation (plateformes, pub get, fichiers web drift, clés API, génération drift)"
   echo "  4) Analyse + tests"
   echo "  5) Lancer l'app"
   echo "  6) Tout sauf git (code local)"

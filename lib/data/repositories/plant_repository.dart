@@ -17,22 +17,27 @@ class PlantRepository {
   Future<PlantSpecies?> getSpecies(String id) =>
       (_db.select(_db.plantSpeciesTable)..where((s) => s.id.equals(id))).map(_species).getSingleOrNull();
 
-  Future<void> saveSpecies(PlantSpecies s) => _db.into(_db.plantSpeciesTable).insertOnConflictUpdate(
-        PlantSpeciesTableCompanion.insert(
-          id: s.id,
-          scientificName: s.scientificName,
-          commonName: s.commonName,
-          imageUrl: Value(s.imageUrl),
-          light: s.light,
-          minTempC: s.minTempC,
-          maxTempC: s.maxTempC,
-          soil: s.soil,
-          watering: s.watering,
-          fertilizing: s.fertilizing,
-          diagnostics: s.diagnostics,
-          cutting: Value(s.cutting),
-          repotting: Value(s.repotting),
-        ),
+  Future<void> saveSpecies(PlantSpecies s) => _db.into(_db.plantSpeciesTable).insertOnConflictUpdate(_speciesRow(s));
+
+  /// Ajoute les espèces absentes sans écraser celles déjà en base (catalogue relu à chaque lancement).
+  Future<void> addMissingSpecies(List<PlantSpecies> species) => _db.batch(
+        (b) => b.insertAll(_db.plantSpeciesTable, species.map(_speciesRow), mode: InsertMode.insertOrIgnore),
+      );
+
+  PlantSpeciesTableCompanion _speciesRow(PlantSpecies s) => PlantSpeciesTableCompanion.insert(
+        id: s.id,
+        scientificName: s.scientificName,
+        commonName: s.commonName,
+        imageUrl: Value(s.imageUrl),
+        light: s.light,
+        minTempC: s.minTempC,
+        maxTempC: s.maxTempC,
+        soil: s.soil,
+        watering: s.watering,
+        fertilizing: s.fertilizing,
+        diagnostics: s.diagnostics,
+        cutting: Value(s.cutting),
+        repotting: Value(s.repotting),
       );
 
   Stream<List<OwnedPlant>> watchOwnedPlants() {

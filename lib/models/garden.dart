@@ -73,11 +73,13 @@ class LightReading {
   final double estimatedLux;
   final DateTime takenAt;
 
-  LightLevel get level => switch (estimatedLux) {
-        < 250 => LightLevel.shade,
-        < 1000 => LightLevel.lowLight,
-        < 5000 => LightLevel.brightIndirect,
-        < 20000 => LightLevel.partialSun,
-        _ => LightLevel.fullSun,
-      };
+  LightLevel get level => lightLevelFor(estimatedLux);
 }
+
+LightLevel lightLevelFor(double lux) => switch (lux) {
+      < 250 => LightLevel.shade,
+      < 1000 => LightLevel.lowLight,
+      < 5000 => LightLevel.brightIndirect,
+      < 20000 => LightLevel.partialSun,
+      _ => LightLevel.fullSun,
+    };
