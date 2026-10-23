@@ -12,7 +12,7 @@ Branche de travail : `claude/new-session-7hha19`.
 - Étape 3 : catalogue `assets/plants_fr.json` (25 espèces FR, clé `image` = emoji ; une URL `http…` ou un chemin `assets/…` sera affiché comme image), copié au lancement dans `plant_species` sans écraser l'existant (`speciesCatalogProvider`). Écrans `lib/features/plants/` : liste « Mes plantes », catalogue avec recherche sans accents, fiche espèce, fiche plante (renommer, supprimer, placer/déplacer, retirer du plan). Placement : `placingPlantProvider` + onglet Jardin, appui sur une pièce/zone ; pastilles emoji déplaçables par glisser. Position des plantes relative au coin de leur pièce (elles suivent son déplacement). Dialogues communs : `lib/features/dialogs.dart`. 20 tests OK. Validé par l'utilisateur sur Linux.
 
 ## En attente de décision
-- Étape 4 : `flutter_local_notifications` ne marche pas sur le web ; sur iPhone les notifications PWA demandent Web Push (serveur). À trancher (alertes dans l'app seulement ?).
+- Étape 4 : `flutter_local_notifications` ne marche pas sur le web ; sur iPhone les notifications PWA demandent Web Push (serveur). À trancher. Piste recommandée : alertes dans l'app + notifications Android/Linux + export `.ics` vers Calendrier pour iOS (une web app n'a pas accès à Calendrier/Rappels ; alternatives : abonnement `webcal://` avec serveur, ou Raccourci iOS appelé par lien `shortcuts://`). À vérifier : Safari iPhone accepte-t-il le `.ics` téléchargé depuis l'app Flutter web ?
 - Étape 5 : `camera` web ne verrouille pas l'exposition ; mesure de lumière moins fiable sur iPhone, calibrage séparé.
 
 ## Points d'attention
