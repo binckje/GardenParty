@@ -164,4 +164,21 @@ void main() {
     expect(lightLevels(['full sun']), [LightLevel.fullSun]);
     expect(lightLevels([]), [LightLevel.brightIndirect]);
   });
+
+  test('offre gratuite : fiches n° > 3000 refusées sans appel, triées après les autres', () async {
+    final perenual = PerenualClient(container.read(apiCacheProvider), 'secret');
+    await expectLater(perenual.details(5257), throwsA(isA<ApiException>()));
+    expect(calls, isEmpty);
+    expect(const PerenualHit(id: 5257, commonName: '', scientificName: '').freeAccess, isFalse);
+  });
+
+  test('429 « Please Upgrade Plan » : message fiche payante, pas quota', () async {
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    final cache = ApiCache(db, MockClient((_) async => http.Response('Please Upgrade Plan - https://perenual.com', 429)));
+    await expectLater(
+      cache.getJson(Uri.parse('https://perenual.com/api/v2/species/details/12?key=k')),
+      throwsA(isA<ApiException>().having((e) => e.message, 'message', startsWith('Fiche réservée'))),
+    );
+  });
 }

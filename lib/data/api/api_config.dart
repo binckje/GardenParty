@@ -17,8 +17,6 @@ class ApiException implements Exception {
   final String message;
   final int? statusCode;
 
-  bool get quotaExceeded => statusCode == 429;
-
   @override
   String toString() => 'ApiException($statusCode): $message';
 }

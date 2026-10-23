@@ -57,6 +57,8 @@ String _errorMessage(int status, String host, String body) {
   final base = switch (status) {
     401 || 403 => 'Clé API refusée par $host.',
     404 => 'Plante introuvable sur $host.',
+    // Perenual répond aussi 429 pour une fiche hors offre gratuite.
+    429 when body.toLowerCase().contains('upgrade') => 'Fiche réservée à l\'offre payante de $host.',
     429 => 'Quota atteint sur $host.',
     _ => 'Erreur $status de $host.',
   };

@@ -109,7 +109,11 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
                 child: h.thumbnailUrl == null ? const Text('🌐') : null,
               ),
               title: Text(h.commonName.isEmpty ? h.scientificName : h.commonName),
-              subtitle: Text(h.scientificName, style: const TextStyle(fontStyle: FontStyle.italic)),
+              subtitle: Text(
+                h.freeAccess ? h.scientificName : '${h.scientificName} · fiche payante',
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+              enabled: h.freeAccess,
               onTap: () => openOnlineSpecies(
                 context,
                 () => ref.read(plantLookupProvider).fetchSpecies(h.id),
@@ -186,6 +190,6 @@ Future<void> identifyFromPhoto(BuildContext context, WidgetRef ref) async {
   await openOnlineSpecies(
     context,
     () => lookup.speciesForMatch(chosen),
-    notFound: 'Pas de fiche d\'entretien en ligne pour ${chosen.scientificName}',
+    notFound: 'Pas de fiche d\'entretien gratuite en ligne pour ${chosen.scientificName}',
   );
 }

@@ -49,9 +49,10 @@ class PlantLookupService {
 
   Future<List<PlantNetMatch>> identifyPhoto(List<Uint8List> images) => plantnet.identify(images);
 
-  /// Après identification photo : fiche de l'espèce reconnue, ou null si Perenual ne la connaît pas.
+  /// Après identification photo : fiche de l'espèce reconnue, ou null si Perenual ne la connaît pas
+/// ou ne la donne qu'en offre payante.
   Future<PlantSpecies?> speciesForMatch(PlantNetMatch match) async {
-    final hits = await perenual.search(match.scientificName);
+    final hits = (await perenual.search(match.scientificName)).where((h) => h.freeAccess);
     if (hits.isEmpty) return null;
     final exact = hits.where((h) => h.scientificName.toLowerCase() == match.scientificName.toLowerCase());
     return fetchSpecies((exact.firstOrNull ?? hits.first).id);
