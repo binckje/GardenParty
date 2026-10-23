@@ -21,7 +21,7 @@ class PlantSpecies {
   final String id;
   final String scientificName;
   final String commonName;
-  /// Visuel : emoji pour l'instant ; une URL `http…` ou un chemin `assets/…` sera affiché comme image.
+  /// Visuel : emoji, photo en data URI (gardée hors ligne), URL `http…` ou chemin `assets/…`.
   final String? imageUrl;
   final List<LightLevel> light;
   final double minTempC, maxTempC;
@@ -31,6 +31,23 @@ class PlantSpecies {
   final List<Diagnostic> diagnostics;
   final PropagationInfo? cutting;
   final RepottingInfo? repotting;
+
+  /// Même fiche avec un autre visuel.
+  PlantSpecies withImage(String? image) => PlantSpecies(
+        id: id,
+        scientificName: scientificName,
+        commonName: commonName,
+        imageUrl: image,
+        light: light,
+        minTempC: minTempC,
+        maxTempC: maxTempC,
+        soil: soil,
+        watering: watering,
+        fertilizing: fertilizing,
+        diagnostics: diagnostics,
+        cutting: cutting,
+        repotting: repotting,
+      );
 
   /// Entrée de la base locale `assets/plants_fr.json` (clé `image` : emoji ou chemin d'image).
   factory PlantSpecies.fromJson(Map<String, dynamic> j) => PlantSpecies(

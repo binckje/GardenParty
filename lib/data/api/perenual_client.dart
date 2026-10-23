@@ -69,7 +69,7 @@ class PerenualClient {
 
   static String? imageUrl(dynamic image, {bool small = false}) {
     if (image is! Map) return null;
-    final url = (small ? image['thumbnail'] ?? image['small_url'] : image['regular_url'] ?? image['medium_url']) as String?;
+    final url = (small ? image['thumbnail'] ?? image['small_url'] : image['medium_url'] ?? image['regular_url']) as String?;
     return url == null || isUpgradeText(url) ? null : url;
   }
 

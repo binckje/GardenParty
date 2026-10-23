@@ -17,6 +17,10 @@ class PlantRepository {
   Future<PlantSpecies?> getSpecies(String id) =>
       (_db.select(_db.plantSpeciesTable)..where((s) => s.id.equals(id))).map(_species).getSingleOrNull();
 
+  /// Fiches dont le visuel est encore une adresse web (photo pas encore gardée hors ligne).
+  Future<List<PlantSpecies>> speciesWithWebImage() =>
+      (_db.select(_db.plantSpeciesTable)..where((s) => s.imageUrl.like('http%'))).map(_species).get();
+
   Future<void> saveSpecies(PlantSpecies s) => _db.into(_db.plantSpeciesTable).insertOnConflictUpdate(_speciesRow(s));
 
   /// Ajoute les espèces absentes sans écraser celles déjà en base (catalogue relu à chaque lancement).

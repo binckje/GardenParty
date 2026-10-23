@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import '../models/plant.dart';
 import 'api/api_cache.dart';
 import 'api/api_config.dart';
 import 'api/gbif_client.dart';
+import 'api/image_downloader.dart';
 import 'api/perenual_client.dart';
 import 'api/plant_lookup_service.dart';
 import 'api/plantnet_client.dart';
@@ -44,6 +46,8 @@ final speciesCatalogProvider = FutureProvider<void>((ref) async {
   await ref
       .read(plantRepositoryProvider)
       .addMissingSpecies([for (final j in json) PlantSpecies.fromJson(j as Map<String, dynamic>)]);
+  // Sans attendre : le réseau peut manquer, on réessaiera au prochain lancement.
+  unawaited(ref.read(plantLookupProvider).storeWebImagesOffline());
 });
 
 /// Plante en attente de placement : l'écran du plan attend un appui pour la poser.
@@ -66,5 +70,6 @@ final plantLookupProvider = Provider((ref) {
     tela: TelaClient(cache),
     plantnet: PlantNetClient(ref.watch(httpClientProvider), keys.plantnet),
     plants: ref.watch(plantRepositoryProvider),
+    images: ImageDownloader(ref.watch(httpClientProvider)),
   );
 });

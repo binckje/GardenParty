@@ -12,6 +12,7 @@ import 'package:garden_party/data/api/plantnet_client.dart';
 import 'package:garden_party/data/api/tela_client.dart';
 import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
+import 'package:garden_party/data/api/image_downloader.dart';
 import 'package:garden_party/data/repositories/plant_repository.dart';
 import 'package:garden_party/features/plants/catalog_screen.dart';
 import 'package:garden_party/models/plant.dart';
@@ -27,6 +28,7 @@ class _FakeLookup extends PlantLookupService {
           tela: TelaClient(ApiCache(db, MockClient((_) async => http.Response('', 500)))),
           plantnet: PlantNetClient(MockClient((_) async => http.Response('', 500)), 'k'),
           plants: PlantRepository(db),
+          images: ImageDownloader(MockClient((_) async => http.Response('', 500))),
         );
 
   final Future<List<OnlineHit>> Function(String) result;

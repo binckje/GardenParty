@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garden_party/data/api/api_cache.dart';
 import 'package:garden_party/data/api/api_config.dart';
 import 'package:garden_party/data/api/gbif_client.dart';
+import 'package:garden_party/data/api/image_downloader.dart';
 import 'package:garden_party/data/api/perenual_client.dart';
 import 'package:garden_party/data/api/plant_lookup_service.dart';
 import 'package:garden_party/data/api/plantnet_client.dart';
@@ -16,6 +17,7 @@ import 'package:garden_party/data/api/tela_client.dart';
 import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
 import 'package:garden_party/models/garden.dart';
+import 'package:garden_party/models/plant.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -113,6 +115,7 @@ void main() {
     final client = MockClient((req) async {
       calls.add(req.url);
       if (offline) throw http.ClientException('hors ligne');
+      if (req.url.host == 'img') return http.Response.bytes([1, 2, 3], 200, headers: {'content-type': 'image/jpeg'});
       return http.Response(jsonEncode(_routes(req.url)), 200, headers: {'content-type': 'application/json'});
     });
     container = ProviderContainer(overrides: [
@@ -150,6 +153,27 @@ void main() {
     expect(s.cutting!.method, 'Bouture de tige');
     expect(s.diagnostics.single.symptom, contains('araignées rouges'));
     expect(await container.read(plantRepositoryProvider).getSpecies('perenual-42'), isNotNull);
+  });
+
+  test('photo Perenual gardée hors ligne en data URI', () async {
+    final s = await container.read(plantLookupProvider).fetchSpecies(42);
+    expect(s.imageUrl, 'data:image/jpeg;base64,AQID');
+    expect((await container.read(plantRepositoryProvider).getSpecies('perenual-42'))!.imageUrl, s.imageUrl);
+  });
+
+  test('photo inaccessible : adresse web gardée, rattrapée au lancement suivant', () async {
+    final repo = container.read(plantRepositoryProvider);
+    final web = PlantSpecies.fromJson({
+      'id': 'x', 'scientificName': 'X', 'commonName': 'X', 'image': 'https://img/r.jpg', 'light': ['shade'],
+      'minTempC': 0, 'maxTempC': 30, 'soil': 's',
+      'watering': {'everyDays': 7, 'quantity': 'q', 'activeMonths': [5]},
+      'fertilizing': {'everyDays': 30, 'quantity': 'q', 'activeMonths': [5]},
+    });
+    await repo.saveSpecies(web);
+    expect(await ImageDownloader(MockClient((_) async => http.Response('', 404))).toDataUri('https://img/r.jpg'), isNull);
+    await container.read(plantLookupProvider).storeWebImagesOffline();
+    expect((await repo.getSpecies('x'))!.imageUrl, startsWith('data:image/jpeg'));
+    expect(await repo.speciesWithWebImage(), isEmpty);
   });
 
   test('cache : pas de second appel réseau, et resservi hors ligne même périmé', () async {
@@ -224,6 +248,7 @@ void main() {
       tela: TelaClient(container.read(apiCacheProvider)),
       plantnet: PlantNetClient(MockClient((_) async => http.Response('', 500)), ''),
       plants: container.read(plantRepositoryProvider),
+      images: ImageDownloader(MockClient((_) async => http.Response('', 500))),
     );
     final gbifHits = await noKey.searchByName('faux philodendron');
     expect(gbifHits.single.fullSheet, isFalse);
