@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../../models/plant.dart';
 import '../repositories/plant_repository.dart';
 import 'gbif_client.dart';
+import 'image_downloader.dart';
 import 'perenual_client.dart';
 import 'api_config.dart';
 import 'plantnet_client.dart';
@@ -19,6 +20,7 @@ class PlantLookupService {
     required this.tela,
     required this.plantnet,
     required this.plants,
+    required this.images,
   });
 
   final PerenualClient perenual;
@@ -26,6 +28,7 @@ class PlantLookupService {
   final TelaClient tela;
   final PlantNetClient plantnet;
   final PlantRepository plants;
+  final ImageDownloader images;
 
   /// Recherche par nom. Perenual cherche en anglais/latin : un nom français sans résultat passe
   /// par GBIF pour obtenir le nom scientifique. Sans résultat Perenual (ou clé absente, quota…),
@@ -72,8 +75,9 @@ class PlantLookupService {
       frenchName: frNames.firstOrNull,
       scientificName: taxon?.canonicalName,
     );
-    await plants.saveSpecies(species);
-    return species;
+    final saved = await _withOfflineImage(species);
+    await plants.saveSpecies(saved);
+    return saved;
   }
 
   /// Fiche sans Perenual : nom français GBIF (sinon [commonName]) ; entretien déduit du milieu
@@ -97,6 +101,23 @@ class PlantLookupService {
     }
     await plants.saveSpecies(species);
     return species;
+  }
+
+  /// Remplace l'adresse web de la photo par l'image elle-même ; inchangée si le téléchargement échoue.
+  Future<PlantSpecies> _withOfflineImage(PlantSpecies s) async {
+    final url = s.imageUrl;
+    if (url == null || !url.startsWith('http')) return s;
+    final data = await images.toDataUri(url);
+    return data == null ? s : s.withImage(data);
+  }
+
+  /// Rattrapage : garde hors ligne les photos des fiches enregistrées avec leur seule adresse web
+  /// (fiches antérieures, ou téléchargement échoué faute de réseau). Appelé au lancement.
+  Future<void> storeWebImagesOffline() async {
+    for (final s in await plants.speciesWithWebImage()) {
+      final saved = await _withOfflineImage(s);
+      if (!identical(saved, s)) await plants.saveSpecies(saved);
+    }
   }
 
   /// Source d'enrichissement facultative : une panne n'empêche pas de créer la fiche.

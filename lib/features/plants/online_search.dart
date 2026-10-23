@@ -110,7 +110,7 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
               ),
               title: Text(h.commonName.isEmpty ? h.scientificName : h.commonName),
               subtitle: Text(
-                h.fullSheet ? h.scientificName : '${h.scientificName} · fiche simplifiée',
+                h.fullSheet ? '${h.scientificName} · Perenual' : '${h.scientificName} · GBIF, fiche simplifiée',
                 style: const TextStyle(fontStyle: FontStyle.italic),
               ),
               onTap: () => openOnlineSpecies(
@@ -174,7 +174,10 @@ Future<void> identifyFromPhoto(BuildContext context, WidgetRef ref) async {
     context: context,
     builder: (c) => SafeArea(
       child: ListView(shrinkWrap: true, children: [
-        const ListTile(title: Text('C\'est peut-être…', style: TextStyle(fontWeight: FontWeight.bold))),
+        const ListTile(
+          title: Text('C\'est peut-être…', style: TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text('Identification Pl@ntNet'),
+        ),
         for (final m in matches)
           ListTile(
             leading: Text('${(m.score * 100).round()} %'),
