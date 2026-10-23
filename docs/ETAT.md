@@ -13,6 +13,7 @@ Branche de travail : `claude/new-session-7hha19`.
 
 ## En attente de décision
 - Étape 4 : `flutter_local_notifications` ne marche pas sur le web ; sur iPhone les notifications PWA demandent Web Push (serveur). À trancher. Piste recommandée : alertes dans l'app + notifications Android/Linux + export `.ics` vers Calendrier pour iOS (une web app n'a pas accès à Calendrier/Rappels ; alternatives : abonnement `webcal://` avec serveur, ou Raccourci iOS appelé par lien `shortcuts://`). À vérifier : Safari iPhone accepte-t-il le `.ics` téléchargé depuis l'app Flutter web ?
+  Option préférée ensuite : synchro Google Agenda (API Calendar v3, agenda dédié « GardenParty », événements récurrents + rappels, mis à jour par id). Prérequis : projet Google Cloud, client OAuth Web (+ client Bureau pour Linux, `google_sign_in` non dispo sur Linux), app en mode test (utilisateur testeur), web servi en HTTPS (ex. GitHub Pages ; `http://IP-locale` refusé par Google). Jeton web valable 1 h : reconsentement à la synchro.
 - Étape 5 : `camera` web ne verrouille pas l'exposition ; mesure de lumière moins fiable sur iPhone, calibrage séparé.
 
 ## Points d'attention
