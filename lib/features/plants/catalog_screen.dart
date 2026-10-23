@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../data/providers.dart';
 import '../../models/plant.dart';
 import '../dialogs.dart';
+import '../light/suggested_spots.dart';
 import 'online_search.dart';
 import 'plant_screen.dart';
 import 'species_editor.dart';
@@ -144,6 +145,7 @@ class SpeciesScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             Center(child: Text(species.scientificName, style: const TextStyle(fontStyle: FontStyle.italic))),
             const SizedBox(height: 16),
+            SuggestedSpots(species: species),
             SpeciesDetails(species),
           ],
         ),

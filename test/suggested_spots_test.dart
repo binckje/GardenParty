@@ -57,4 +57,28 @@ void main() {
     expect(repo.saved.single.x, 1);
     expect(repo.saved.single.y, 1);
   });
+
+  testWidgets('fiche espèce : suggestions sans bouton « Placer ici »', (tester) async {
+    final species = [
+      for (final j in jsonDecode(File('assets/plants_fr.json').readAsStringSync()) as List)
+        PlantSpecies.fromJson(j as Map<String, dynamic>),
+    ].firstWhere((s) => s.light.contains(LightLevel.brightIndirect));
+    final salon = Space(
+      id: 's',
+      name: 'Salon',
+      kind: SpaceKind.indoorRoom,
+      x: 0,
+      y: 0,
+      width: 4,
+      height: 3,
+      lightReadings: [_r('a', 1, 1, 3000)],
+    );
+    await tester.pumpWidget(ProviderScope(
+      overrides: [spacesProvider.overrideWith((ref) => Stream.value([salon]))],
+      child: MaterialApp(home: Scaffold(body: SuggestedSpots(species: species))),
+    ));
+    await tester.pump();
+    expect(find.textContaining('Salon ·'), findsOneWidget);
+    expect(find.text('Placer ici'), findsNothing);
+  });
 }
