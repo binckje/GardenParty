@@ -75,6 +75,8 @@ prepare() {
   step "Dépendances"
   flutter pub get
 
+  web_assets
+
   step "Code généré (drift)"
   local gen=lib/data/db/database.g.dart
   if [[ ! -f "$gen" ]] || [[ -n "$(find lib/data/db -name '*.dart' ! -name '*.g.dart' -newer "$gen")" ]]; then
@@ -82,6 +84,27 @@ prepare() {
   else
     ok "database.g.dart à jour"
   fi
+}
+
+# Version résolue d'un paquet dans pubspec.lock.
+lock_version() {
+  awk -v pkg="  $1:" '$0 == pkg {found=1} found && /version:/ {gsub(/"/, "", $2); print $2; exit}' pubspec.lock
+}
+
+# drift sur le web : sqlite3.wasm et drift_worker.js doivent correspondre aux versions de pubspec.lock.
+web_assets() {
+  step "Fichiers web de drift"
+  local sqlite drift stamp=web/.drift_assets
+  sqlite=$(lock_version sqlite3); drift=$(lock_version drift)
+  [[ -n "$sqlite" && -n "$drift" ]] || die "versions sqlite3/drift introuvables dans pubspec.lock"
+  if [[ -f web/sqlite3.wasm && -f web/drift_worker.js && "$(cat "$stamp" 2>/dev/null)" == "$sqlite/$drift" ]]; then
+    ok "sqlite3.wasm $sqlite / drift_worker.js $drift présents"
+    return 0
+  fi
+  curl -fsSL -o web/sqlite3.wasm "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-$sqlite/sqlite3.wasm"
+  curl -fsSL -o web/drift_worker.js "https://github.com/simolus3/drift/releases/download/drift-$drift/drift_worker.js"
+  echo "$sqlite/$drift" > "$stamp"
+  ok "Téléchargés : sqlite3.wasm $sqlite, drift_worker.js $drift"
 }
 
 run_checks() {
@@ -125,7 +148,7 @@ main() {
   echo "${c_info}GardenParty — dev${c_off}"
   echo "  1) Tout : git → préparation → tests → lancement"
   echo "  2) Git seulement"
-  echo "  3) Préparation (plateformes, pub get, génération drift)"
+  echo "  3) Préparation (plateformes, pub get, fichiers web drift, génération drift)"
   echo "  4) Analyse + tests"
   echo "  5) Lancer l'app"
   echo "  6) Tout sauf git (code local)"

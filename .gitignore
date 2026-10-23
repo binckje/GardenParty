@@ -9,3 +9,8 @@ build/
 **/Pods/
 **/.symlinks/
 local.properties
+
+# Fichiers web de drift, téléchargés par scripts/dev.sh (versions de pubspec.lock)
+web/sqlite3.wasm
+web/drift_worker.js
+web/.drift_assets

@@ -27,6 +27,19 @@ class Space {
   double x, y, width, height;
   List<Opening> openings;
   List<LightReading> lightReadings;
+
+  /// Copie modifiable (ouvertures dupliquées) pour l'édition du plan.
+  Space copy() => Space(
+        id: id,
+        name: name,
+        kind: kind,
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        openings: [for (final o in openings) o.copy()],
+        lightReadings: lightReadings,
+      );
 }
 
 /// Porte ou fenêtre posée sur un mur d'une pièce.
@@ -39,6 +52,8 @@ class Opening {
   /// 0 = haut, 1 = droite, 2 = bas, 3 = gauche.
   final int wall;
   double offset, length;
+
+  Opening copy({int? wall}) => Opening(id: id, kind: kind, wall: wall ?? this.wall, offset: offset, length: length);
 }
 
 /// Mesure de luminosité prise avec la caméra à un point donné de la pièce.
