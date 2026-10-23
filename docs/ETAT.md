@@ -23,13 +23,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - Sources : capteur (Android, paquet `light`), caméra (Android/web : luminance moyenne × facteur de calibrage dans `SharedPreferences`), saisie (5 repères qualitatifs ou lux d'un luxmètre). Pas de caméra sur Linux.
   - `LightAnalysis.bestSpots(spaces, species.light)` : emplacements conseillés, pas encore affichés.
   - `dev.sh` : web-server en HTTPS (certificat auto-signé dans `.dart_tool/dev_cert`), nécessaire à la caméra sur iPhone.
-  - 35 tests OK (Flutter 3.47). Pas testé sur appareil réel ici.
-
-## Tests à faire (étape 5)
-1. `./scripts/dev.sh` → 1 (pubspec.lock a changé).
-2. Linux : Jardin → ☀️ → choisir « Midi » → toucher une pièce → onglet « Saisie » → choisir un repère : tache colorée + lux. Toucher le point : détail, re-mesurer, supprimer. « Bilan » : couleur = niveau médian.
-3. Android : onglet « Capteur » (téléphone à plat) ; onglet « Caméra » → « Calibrer » (valeur du capteur pré-remplie) puis « Mesurer ».
-4. iPhone : `dev.sh` → lancement 3, ouvrir l'URL **https**, accepter le certificat, autoriser la caméra ; « Calibrer » avec un repère puis « Mesurer ».
+  - 35 tests OK (Flutter 3.47). Validé par l'utilisateur.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -44,6 +38,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Google sur iPhone : impossible depuis `http://<ip>` (Google exige https ou localhost). Contournement : synchro depuis Linux/Android, l'iPhone voit l'agenda via le compte Google ; sinon héberger le web en HTTPS (ex. GitHub Pages).
 
 ## Points d'attention
+- Premier build après changement de `pubspec.lock` : `sqlite3` télécharge SQLite depuis GitHub ; en cas de « Connection reset by peer », relancer.
 - Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter cassent le build Linux.
 - Web hors-ligne complet : `flutter build web --no-web-resources-cdn`.
 - Écran de consentement Google en mode « Test » : jeton de rafraîchissement valable 7 jours, reconnecter ensuite.
