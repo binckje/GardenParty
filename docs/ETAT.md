@@ -29,7 +29,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - Retour utilisateur : « quota atteint » Perenual = fiche hors offre gratuite (Perenual répond 429 « Please Upgrade Plan » pour les espèces n° > 3000, ex. Monstera 5257) : ces résultats (et toute espèce sans résultat Perenual, clé absente ou quota) donnent une fiche simplifiée GBIF (id `gbif-<clé>`, nom français GBIF, entretien moyen par défaut, bandeau « Fiche simplifiée ») ; attente bloquée corrigée (dialogue sur le navigateur racine).
   - Éditeur de fiche (`lib/features/plants/species_editor.dart`) : bouton « Créer une fiche » du catalogue (id `perso-<uuid>`) et « Modifier » sur toute fiche espèce (id conservé ; une fiche du catalogue modifiée n'est plus écrasée par `addMissingSpecies`). Tous les champs ; photo (appareil/galerie, 600 px) stockée en data URI dans `imageUrl`, ou emoji. 51 tests OK.
   - Recherche de bases alternatives (réseau bloqué ici, recherche web seulement) : Trefle actif à nouveau (dépôt mis à jour en oct. 2026, jeton gratuit) ; Tela Botanica eFlore/baseflor (sans clé, indicateurs écologiques de la flore de France, API parfois en panne) ; API plantes d'intérieur (Zyla, Apify) payantes ; Plants For A Future sans API. Tests curl de l'utilisateur : Trefle abandonné (données `growth` toutes à null, même pour la lavande). Tela : `https://api.tela-botanica.org/service:eflore:0.1/bdtfx/noms?masque=<nom>&retour.format=min` marche (lavande = nn 38072) ; données baseflor : identifiant au format `bdtfx.nn:<nn>` (deux-points), ex. `https://api.tela-botanica.org/service:eflore:0.1/baseflor/informations/bdtfx.nn:73259` ; liste : `baseflor/informations?navigation.depart=0&navigation.limite=1` (8006 taxons). Intégré : `tela_client.dart` (nom → nn via `bdtfx/noms`, puis `?categorie=ecologie`) ; sans fiche Perenual gratuite, `simplifiedSpecies` essaie Tela (fiche `tela-<nn>`, lumière d'Ellenberg, température, humidité du sol, pH/nutriments, bandeau « Fiche écologique ») puis GBIF par défaut. 52 tests OK (réseau simulé). Non vérifié : CORS de Tela sur le web.
-- Emplacements conseillés sur les fiches plante et espèce (voir étape 5). 55 tests OK.
+- Emplacements conseillés sur les fiches plante et espèce (voir étape 5). 55 tests OK. Validé par l'utilisateur sur Linux.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -52,4 +52,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Valider sur Linux les emplacements conseillés (fiches plante et espèce) et la recherche en ligne avec les vraies clés (Linux, puis iPhone pour la photo).
+Valider la recherche en ligne avec les vraies clés (Linux, puis iPhone pour la photo).
