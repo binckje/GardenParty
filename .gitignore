@@ -14,3 +14,6 @@ local.properties
 web/sqlite3.wasm
 web/drift_worker.js
 web/.drift_assets
+
+# Identifiants OAuth Google Agenda (voir google_oauth.env.example)
+google_oauth.env

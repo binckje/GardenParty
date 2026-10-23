@@ -74,6 +74,8 @@ prepare() {
   fi
   # Test généré par défaut par flutter create, référence MyApp inexistant.
   rm -f test/widget_test.dart
+  # Notifications programmées : desugaring, permissions et récepteurs dans android/ (généré).
+  [[ -d android ]] && python3 scripts/patch_android.py
 
   step "Dépendances"
   # pubspec.lock modifié depuis la dernière préparation : on repart propre,
@@ -126,8 +128,19 @@ run_checks() {
   flutter test || { ask "Tests en échec, continuer ?" || exit 1; }
 }
 
+# Identifiants OAuth Google Agenda (facultatifs) : google_oauth.env, non versionné.
+google_defines() {
+  if [[ -f google_oauth.env ]]; then
+    DEFINES=(--dart-define-from-file=google_oauth.env)
+  else
+    DEFINES=()
+    warn "google_oauth.env absent : synchro Google Agenda désactivée (voir google_oauth.env.example)"
+  fi
+}
+
 launch() {
   local device=${1:-}
+  google_defines
   if [[ -z "$device" ]]; then
     step "Lancement"
     echo "  1) linux   2) chrome   3) web-server (iPhone/iPad sur le réseau local)   4) autre appareil"
@@ -143,9 +156,13 @@ launch() {
   if [[ "$device" == web-server ]]; then
     local ip; ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($i=="src") print $(i+1)}')
     echo "Ouvre http://${ip:-<ip-du-pc>}:8080 sur l'iPhone/iPad (même Wi-Fi)."
-    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080
+    echo "(Connexion Google impossible depuis une adresse IP en http : utilise l'export .ics ou la synchro depuis Linux/Android.)"
+    flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 "${DEFINES[@]}"
+  elif [[ "$device" == chrome ]]; then
+    # Port fixe : http://localhost:8080 doit être déclaré comme origine JavaScript du client OAuth web.
+    flutter run -d chrome --web-port 8080 "${DEFINES[@]}"
   else
-    flutter run -d "$device"
+    flutter run -d "$device" "${DEFINES[@]}"
   fi
 }
 

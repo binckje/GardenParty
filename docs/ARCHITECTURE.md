@@ -7,7 +7,9 @@
 | État | Riverpod | Simple, testable |
 | Navigation | go_router (4 onglets : Jardin, Plantes, Calendrier, Réglages) | Standard Flutter |
 | Stockage | Local hors-ligne, SQLite via `drift` (wasm sur le web) | Pas de compte, pas de serveur |
-| Notifications | `flutter_local_notifications` | Rappels arrosage/engrais, alertes d'oubli |
+| Notifications | `flutter_local_notifications` | Android : rappels programmés (`zonedSchedule`). Linux/web : pas de programmation, rappel affiché à l'ouverture et tous les quarts d'heure |
+| Agenda | Export `.ics` (90 jours) + Google Calendar API (`googleapis`, `googleapis_auth`) | Agenda dédié « GardenParty 🌱 », portée `calendar.app.created` seulement |
+| Préférences | `shared_preferences` | Réglages, jetons Google (Linux/Android) |
 | Plan 2D | `CustomPainter` + gestes (drag / pinch / poignées de redimensionnement) | Pas de dépendance lourde |
 | Lumière | `camera` : exposition verrouillée, luminance moyenne de l'image → lux estimé (calibrage). Capteur de lumière Android en bonus | iOS n'expose pas le capteur de lumière |
 | Style | Thème pastel, police Nunito, coins arrondis 24 px | « cosy & kawaii » |
@@ -24,7 +26,16 @@ lib/
                repositories/ garden, plant, care (modèles métier ⇄ lignes SQL)
                providers.dart  databaseProvider (surchargé en test), repositories, StreamProviders
                (à venir) clients API, cache
+  services/    care_notifications.dart, google/ (auth io/web, synchro agenda)
 ```
+
+## Calendrier des soins (étape 4)
+- `care_planner.dart` (pur, testé) : chaque plante a toujours un arrosage et un engrais en attente. Première fois : aujourd'hui 9 h ; ensuite dernière validation + `everyDays` (doublé hors `activeMonths`).
+- `CareService` : `ensureTasks` (démarrage, retour dans l'app, toutes les 15 min, après validation), `complete`, `refreshAlerts`, export .ics.
+- Retards : section « En retard » + pastille sur l'onglet Calendrier.
+- Google : id d'événement = `gp` + hex de l'id de tâche (pas de doublon) ; tâches validées supprimées de l'agenda. Linux/Android : client OAuth « bureau », retour sur 127.0.0.1, jeton de rafraîchissement stocké. Web : jeton 1 h (Google Identity Services), origine `http://localhost:8080`.
+- Identifiants : `google_oauth.env` (non versionné) passé par `dev.sh` en `--dart-define-from-file`.
+- Android : `scripts/patch_android.py` (appelé par `dev.sh`) ajoute desugaring, permissions et récepteurs dans `android/` généré.
 
 ## Données (drift)
 - Tables : `spaces`, `openings`, `light_readings`, `plant_species`, `owned_plants`, `care_tasks`. Enums stockés par nom.
