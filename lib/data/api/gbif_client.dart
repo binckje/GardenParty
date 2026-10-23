@@ -2,12 +2,21 @@ import 'api_cache.dart';
 
 /// Taxon du référentiel GBIF (Backbone Taxonomy).
 class GbifTaxon {
-  const GbifTaxon({required this.key, required this.scientificName, required this.canonicalName, this.family});
+  const GbifTaxon({
+    required this.key,
+    required this.scientificName,
+    required this.canonicalName,
+    this.family,
+    this.frenchName,
+  });
 
   final int key;
   final String scientificName;
   final String canonicalName;
   final String? family;
+
+  /// Premier nom français donné par la recherche (absent de `match`).
+  final String? frenchName;
 }
 
 /// GBIF : sans clé. Normalise les noms scientifiques et fournit les noms vernaculaires français.
@@ -50,6 +59,7 @@ class GbifClient {
             scientificName: r['scientificName'] as String,
             canonicalName: r['canonicalName'] as String,
             family: r['family'] as String?,
+            frenchName: _firstFrench(r['vernacularNames']),
           ),
     ];
   }
@@ -68,4 +78,13 @@ class GbifClient {
     }
     return counts.keys.toList()..sort((a, b) => counts[b]!.compareTo(counts[a]!));
   }
+}
+
+String? _firstFrench(dynamic names) {
+  if (names is! List) return null;
+  for (final n in names.cast<Map<String, dynamic>>()) {
+    final name = (n['vernacularName'] as String? ?? '').trim();
+    if (n['language'] == 'fra' && name.isNotEmpty) return name[0].toUpperCase() + name.substring(1);
+  }
+  return null;
 }

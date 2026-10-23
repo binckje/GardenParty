@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../data/api/api_config.dart';
-import '../../data/api/perenual_client.dart';
+import '../../data/api/plant_lookup_service.dart';
 import '../../data/api/plantnet_client.dart';
 import '../../data/providers.dart';
 import '../../models/plant.dart';
@@ -64,7 +64,7 @@ class OnlineResults extends ConsumerStatefulWidget {
 
 class _OnlineResultsState extends ConsumerState<OnlineResults> {
   String? _searched;
-  Future<List<PerenualHit>>? _results;
+  Future<List<OnlineHit>>? _results;
 
   void _search() => setState(() {
         _searched = widget.query.trim();
@@ -80,7 +80,7 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
       return ListTile(
         leading: const Icon(Icons.travel_explore),
         title: Text('Chercher « $q » en ligne'),
-        subtitle: const Text('Perenual + noms français GBIF'),
+        subtitle: const Text('Perenual, sinon GBIF'),
         onTap: _search,
       );
     }
@@ -110,13 +110,12 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
               ),
               title: Text(h.commonName.isEmpty ? h.scientificName : h.commonName),
               subtitle: Text(
-                h.freeAccess ? h.scientificName : '${h.scientificName} · fiche payante',
+                h.fullSheet ? h.scientificName : '${h.scientificName} · fiche simplifiée',
                 style: const TextStyle(fontStyle: FontStyle.italic),
               ),
-              enabled: h.freeAccess,
               onTap: () => openOnlineSpecies(
                 context,
-                () => ref.read(plantLookupProvider).fetchSpecies(h.id),
+                () => ref.read(plantLookupProvider).fetchHit(h),
                 notFound: 'Fiche introuvable',
               ),
             ),
@@ -190,6 +189,6 @@ Future<void> identifyFromPhoto(BuildContext context, WidgetRef ref) async {
   await openOnlineSpecies(
     context,
     () => lookup.speciesForMatch(chosen),
-    notFound: 'Pas de fiche d\'entretien gratuite en ligne pour ${chosen.scientificName}',
+    notFound: 'Fiche introuvable pour ${chosen.scientificName}',
   );
 }

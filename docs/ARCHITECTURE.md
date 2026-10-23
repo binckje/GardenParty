@@ -70,7 +70,7 @@ Stratégie : base locale d'abord → Perenual → enrichissement GBIF/Wikipedia 
 Implémentation (étape 6) :
 - Clés : `.env` (non versionné, modèle `.env.example`) → `--dart-define-from-file=.env` via `dev.sh` → `ApiKeys.fromEnvironment()`.
 - Cache : réponses JSON par URL sans clé API ; 7 j (recherches), 30 j (GBIF), 90 j (fiches Perenual) ; cache périmé resservi si réseau/quota en échec. Pl@ntNet jamais mis en cache.
-- Offre gratuite Perenual : fiches des espèces n° 1 à 3000 seulement (au-delà : 429 « Please Upgrade Plan »), résultats au-delà grisés.
+- Offre gratuite Perenual : fiches des espèces n° 1 à 3000 seulement (au-delà : 429 « Please Upgrade Plan »), au-delà, ou sans résultat Perenual : fiche simplifiée `gbif-<clé>` (nom GBIF + entretien par défaut, `gbifDefaultSpecies`).
 - Recherche par nom : Perenual ; sans résultat (nom français), GBIF donne le nom scientifique puis Perenual est relancé.
 - Fiche : Perenual → `PlantSpecies` (id `perenual-<id>`), nom français = nom vernaculaire GBIF le plus fréquent ; rusticité USDA → température mini ; engrais : valeur par défaut (Perenual ne la fournit pas).
 - Web : GBIF et Perenual acceptent les appels navigateur ; Pl@ntNet exige d'autoriser le domaine dans le compte my.plantnet.org.

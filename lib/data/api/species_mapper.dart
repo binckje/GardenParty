@@ -30,6 +30,24 @@ PlantSpecies perenualToSpecies(Map<String, dynamic> j, {String? frenchName, Stri
   );
 }
 
+/// Préfixe d'identifiant des fiches simplifiées (GBIF + valeurs par défaut), à ajuster par l'utilisateur.
+const gbifSpeciesPrefix = 'gbif-';
+
+/// Fiche simplifiée quand Perenual n'a pas de fiche gratuite : nom et taxonomie GBIF,
+/// entretien moyen de plante d'intérieur.
+PlantSpecies gbifDefaultSpecies({required int gbifKey, required String scientificName, required String commonName}) =>
+    PlantSpecies(
+      id: '$gbifSpeciesPrefix$gbifKey',
+      scientificName: scientificName,
+      commonName: commonName,
+      light: const [LightLevel.brightIndirect, LightLevel.partialSun],
+      minTempC: 12,
+      maxTempC: 30,
+      soil: 'Terreau universel drainant',
+      watering: const CareSchedule(everyDays: 7, quantity: 'Arroser quand le dessus du terreau est sec'),
+      fertilizing: const CareSchedule(everyDays: 30, quantity: 'Engrais liquide dilué de moitié'),
+    );
+
 List<LightLevel> lightLevels(List<String> sunlight) {
   final levels = <LightLevel>{};
   for (final s in sunlight.map((s) => s.toLowerCase())) {

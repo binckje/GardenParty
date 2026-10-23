@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../../data/api/species_mapper.dart';
 import '../../models/garden.dart';
 import '../../models/plant.dart';
 
@@ -60,6 +61,15 @@ class SpeciesDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (s.id.startsWith(gbifSpeciesPrefix))
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text('Fiche simplifiée'),
+              subtitle: Text('Pas de fiche d\'entretien gratuite en ligne : valeurs moyennes de plante '
+                  'd\'intérieur, à vérifier.'),
+            ),
+          ),
         _Section('☀️ Lumière', Wrap(spacing: 6, runSpacing: 4, children: [
           for (final l in s.light) Chip(label: Text(lightLabel(l)), visualDensity: VisualDensity.compact),
         ])),

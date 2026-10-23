@@ -27,14 +27,14 @@ class _FakeLookup extends PlantLookupService {
           plants: PlantRepository(db),
         );
 
-  final Future<List<PerenualHit>> Function(String) result;
+  final Future<List<OnlineHit>> Function(String) result;
   final queries = <String>[];
 
   @override
-  Future<PlantSpecies> fetchSpecies(int perenualId) async => throw ApiException('Quota atteint sur perenual.com.');
+  Future<PlantSpecies> fetchHit(OnlineHit hit) async => throw ApiException('Quota atteint sur perenual.com.');
 
   @override
-  Future<List<PerenualHit>> searchByName(String query) {
+  Future<List<OnlineHit>> searchByName(String query) {
     queries.add(query);
     return result(query);
   }
@@ -43,7 +43,7 @@ class _FakeLookup extends PlantLookupService {
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
-  Future<_FakeLookup> pumpCatalog(WidgetTester tester, Future<List<PerenualHit>> Function(String) result) async {
+  Future<_FakeLookup> pumpCatalog(WidgetTester tester, Future<List<OnlineHit>> Function(String) result) async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     final lookup = _FakeLookup(db, result);
@@ -64,7 +64,7 @@ void main() {
   testWidgets('recherche en ligne lancée à la demande, résultats affichés', (tester) async {
     final lookup = await pumpCatalog(
       tester,
-      (_) async => const [PerenualHit(id: 42, commonName: 'swiss cheese plant', scientificName: 'Monstera deliciosa')],
+      (_) async => const [OnlineHit(perenualId: 42, commonName: 'swiss cheese plant', scientificName: 'Monstera deliciosa')],
     );
     await tester.enterText(find.byType(TextField), 'monstera');
     await tester.pump();
@@ -89,7 +89,7 @@ void main() {
   testWidgets('échec du chargement d\'une fiche : attente fermée, catalogue toujours affiché', (tester) async {
     await pumpCatalog(
       tester,
-      (_) async => const [PerenualHit(id: 42, commonName: 'swiss cheese plant', scientificName: 'Monstera deliciosa')],
+      (_) async => const [OnlineHit(perenualId: 42, commonName: 'swiss cheese plant', scientificName: 'Monstera deliciosa')],
     );
     await tester.enterText(find.byType(TextField), 'monstera');
     await tester.pump();

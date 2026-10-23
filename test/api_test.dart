@@ -7,7 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden_party/data/api/api_cache.dart';
 import 'package:garden_party/data/api/api_config.dart';
+import 'package:garden_party/data/api/gbif_client.dart';
 import 'package:garden_party/data/api/perenual_client.dart';
+import 'package:garden_party/data/api/plant_lookup_service.dart';
+import 'package:garden_party/data/api/plantnet_client.dart';
 import 'package:garden_party/data/api/species_mapper.dart';
 import 'package:garden_party/data/db/database.dart';
 import 'package:garden_party/data/providers.dart';
@@ -112,7 +115,7 @@ void main() {
 
   test('recherche par nom français via GBIF puis Perenual', () async {
     final hits = await container.read(plantLookupProvider).searchByName('faux philodendron');
-    expect(hits.single.id, 42);
+    expect(hits.single.perenualId, 42);
     expect(calls.map((u) => u.path), contains('/v1/species/search'));
   });
 
@@ -148,7 +151,7 @@ void main() {
     final matches = await lookup.identifyPhoto([Uint8List.fromList([1, 2, 3])]);
     expect(matches.single.scientificName, 'Monstera deliciosa');
     expect(matches.single.gbifKey, 2868241);
-    expect((await lookup.speciesForMatch(matches.single))!.id, 'perenual-42');
+    expect((await lookup.speciesForMatch(matches.single)).id, 'perenual-42');
   });
 
   test('clé absente : erreur explicite', () async {
@@ -180,5 +183,30 @@ void main() {
       cache.getJson(Uri.parse('https://perenual.com/api/v2/species/details/12?key=k')),
       throwsA(isA<ApiException>().having((e) => e.message, 'message', startsWith('Fiche réservée'))),
     );
+  });
+
+  test('fiche payante ou absente de Perenual : fiche simplifiée GBIF', () async {
+    final lookup = container.read(plantLookupProvider);
+    final paid = await lookup.fetchHit(const OnlineHit(perenualId: 5257, commonName: 'x', scientificName: 'Monstera deliciosa'));
+    expect(paid.id, 'gbif-2868241');
+    expect(paid.commonName, 'Monstera');
+    expect(paid.watering.everyDays, 7);
+    expect(calls.map((u) => u.path), isNot(contains('/api/v2/species/details/5257')));
+    expect(await container.read(plantRepositoryProvider).getSpecies('gbif-2868241'), isNotNull);
+  });
+
+  test('aucun résultat Perenual : taxons GBIF proposés en fiche simplifiée', () async {
+    final hits = await container.read(plantLookupProvider).searchByName('ficus inconnu');
+    // GBIF trouve Monstera deliciosa, que Perenual connaît : résultat Perenual.
+    expect(hits.single.fullSheet, isTrue);
+    final noKey = PlantLookupService(
+      perenual: PerenualClient(container.read(apiCacheProvider), ''),
+      gbif: GbifClient(container.read(apiCacheProvider)),
+      plantnet: PlantNetClient(MockClient((_) async => http.Response('', 500)), ''),
+      plants: container.read(plantRepositoryProvider),
+    );
+    final gbifHits = await noKey.searchByName('faux philodendron');
+    expect(gbifHits.single.fullSheet, isFalse);
+    expect(gbifHits.single.gbifKey, 2868241);
   });
 }
