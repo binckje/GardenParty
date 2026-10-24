@@ -19,19 +19,17 @@ class GoogleCalendarSync {
 
   final gcal.CalendarApi _api;
 
-  /// Agenda dédié : réutilise [knownId] s'il existe encore, sinon le retrouve par son nom ou le crée.
+  /// Agenda dédié : réutilise [knownId] s'il existe encore, sinon le crée. La portée
+  /// `calendar.app.created` ne permet pas de lister les agendas : l'id est donc mémorisé par l'app.
   Future<String> ensureCalendar(String? knownId) async {
     if (knownId != null) {
       try {
         await _api.calendars.get(knownId);
         return knownId;
       } on gcal.DetailedApiRequestError catch (e) {
-        if (e.status != 404) rethrow;
+        // 404 : agenda supprimé ; 403 : agenda d'un autre compte Google.
+        if (e.status != 404 && e.status != 403) rethrow;
       }
-    }
-    final list = await _api.calendarList.list();
-    for (final c in list.items ?? const <gcal.CalendarListEntry>[]) {
-      if (c.summary == _calendarName && c.id != null) return c.id!;
     }
     final created = await _api.calendars.insert(gcal.Calendar(summary: _calendarName, timeZone: 'Europe/Paris'));
     return created.id!;

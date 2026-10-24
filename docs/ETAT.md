@@ -16,6 +16,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - `lib/services/care_notifications.dart` : Android = rappels programmés à 9 h ; Linux = rappel à l'ouverture ; web = idem, à activer dans Réglages (autorisation navigateur).
   - `lib/services/google/` : synchro vers un agenda dédié « GardenParty 🌱 » (portée `calendar.app.created`). Linux/Android : client OAuth « bureau » + retour 127.0.0.1, jeton stocké. Web : `http://localhost:8080` seulement, jeton 1 h.
   - Réglages : notifications, Google Agenda (connecter / synchroniser / déconnecter).
+  - Correctif (setup réel par l'utilisateur) : `calendarList.list` donnait 403 `insufficient_scope` (hors portée `calendar.app.created`). Supprimé : l'agenda est créé au premier lien et son id mémorisé (`google.calendarId`, gardé après déconnexion dans `google.lastCalendarId` pour éviter un doublon ; 403/404 sur l'id = recréé). Validé par l'utilisateur sur Linux : agenda « GardenParty 🌱 » visible. Piège rencontré : activer « Google Calendar API » dans le même projet que le client OAuth (sinon 403 « has not been used in project … »).
   - `scripts/patch_android.py` : desugaring + récepteurs de notifications dans `android/` (appelé par `dev.sh`). `dev.sh` passe `google_oauth.env` en `--dart-define-from-file` et fixe le port 8080 pour chrome.
   - 29 tests OK (Flutter 3.47). Build web vérifié dans Chromium. Builds Linux/Android non testés ici (pas de GTK ni SDK Android).
 - Étape 5 : lumière (`lib/features/light/`).
@@ -32,17 +33,18 @@ Branche de travail : `claude/new-session-7hha19`.
 - Emplacements conseillés sur les fiches plante et espèce (voir étape 5). 55 tests OK. Validé par l'utilisateur sur Linux.
 - Sauvegarde/export (avancé depuis l'étape 7) : `lib/data/backup.dart` (`BackupService`, `backupServiceProvider`) exporte en JSON les lignes brutes des tables utilisateur (pièces, ouvertures, mesures, fiches espèces avec photos, plantes, soins ; pas le cache API), avec `app`, `format: 1`, `schemaVersion`. La restauration remplace tout dans une transaction (rien ne change si le fichier est invalide ou vient d'un schéma plus récent), puis rafraîchit les alertes. Réglages, section « Sauvegarde » : export via `file_saver` (comme le .ics), import via `file_picker` 13 (Linux : portail XDG). 57 tests OK, build web OK. Validé par l'utilisateur sur Linux et web-server.
 - Correctif notifications web (iPhone) : l'interrupteur restait bloqué car Safari (onglet normal) n'a pas l'API `Notification` (exception non rattrapée). Désormais : interrupteur grisé avec explication si l'API manque ; si le service worker ne démarre pas ou si l'autorisation est refusée, l'option repasse à « désactivé » avec un message. Sur iPhone, les notifications exigent l'app ajoutée à l'écran d'accueil (iOS 16.4+), servie en HTTPS : avec le certificat auto-signé de `dev.sh` (accepté dans Safari), demande d'autorisation affichée et notification reçue. Validé par l'utilisateur sur iPhone (rappel à l'ouverture de l'app seulement, pas de rappel app fermée sans Web Push).
-- Photos hors ligne : une fiche Perenual enregistre sa photo (taille moyenne `medium_url`) en data URI au lieu de l'adresse web (`lib/data/api/image_downloader.dart`, 800 Ko max). Échec (réseau, CORS sur le web, trop lourde) : l'adresse web reste, l'emoji s'affiche hors ligne, et `PlantLookupService.storeWebImagesOffline()` réessaie à chaque lancement (rattrape aussi les fiches déjà enregistrées). 59 tests OK. Non testé contre le vrai Perenual (réseau bloqué ici).
+- Photos hors ligne : une fiche Perenual enregistre sa photo (taille moyenne `medium_url`) en data URI au lieu de l'adresse web (`lib/data/api/image_downloader.dart`, 800 Ko max). Échec (réseau, CORS sur le web, trop lourde) : l'adresse web reste, l'emoji s'affiche hors ligne, et `PlantLookupService.storeWebImagesOffline()` réessaie à chaque lancement (rattrape aussi les fiches déjà enregistrées). 59 tests OK. Validé par l'utilisateur (photo affichée réseau coupé).
 - Source des fiches : section « 📚 Source » en bas de chaque fiche espèce (`speciesSource()` dans `species_mapper.dart`, déduite du préfixe d'id : Perenual, Tela Botanica, GBIF, fiche personnelle, catalogue), avec lien cliquable vers la page d'origine. Résultats de recherche en ligne : « · Perenual » ou « · GBIF, fiche simplifiée » ; propositions photo : « Identification Pl@ntNet ». 60 tests OK.
 - Recherche en ligne validée par l'utilisateur avec les vraies clés API.
+- Identification photo Pl@ntNet validée sur iPhone (5 propositions, fiche OK). Ajout : chaque proposition affiche une photo Pl@ntNet de l'espèce (`include-related-images=true`, `PlantNetMatch.imageUrl`, taille `s`) et le score en sous-titre ; repli emoji 🌿 ; sur le web `WebHtmlElementStrategy.fallback` si CORS. Validé par l'utilisateur sur iPhone.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
-1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
-2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
-3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
-4. Google Agenda (facultatif) : suivre `google_oauth.env.example`, créer `google_oauth.env`, relancer, Réglages → « Connecter Google Agenda » → agenda « GardenParty 🌱 » visible dans Google Agenda.
-5. Android : notification à 9 h le jour d'un soin, même app fermée.
+1. ~~Lancement~~ : fait.
+2. ~~Calendrier Linux~~ : validé.
+3. ~~Export .ics~~ : validé.
+4. ~~Google Agenda~~ : validé.
+5. Android : notification à 9 h le jour d'un soin, même app fermée. (reporté : pas d'appareil Android disponible pour l'instant).
 
 
 ## En attente de décision
@@ -50,6 +52,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Google sur iPhone : impossible depuis `http://<ip>` (Google exige https ou localhost). Contournement : synchro depuis Linux/Android, l'iPhone voit l'agenda via le compte Google ; sinon héberger le web en HTTPS (ex. GitHub Pages).
 
 ## Points d'attention
+- Pl@ntNet sur le web (iPhone) : sur my.plantnet.org, mettre l'adresse locale du PC (ex. `192.168.1.115`, une des formes `192.168.1.115`, `192.168.1.115:8080`, `https://192.168.1.115:8080`) dans « Authorized domains », et laisser « Authorized IPs » vide (comparé à l'IP publique ; une IP locale y donne 403 « remote IP not allowed »). Fixer l'IP du PC dans la box (réservation DHCP).
 - Sauvegarde : si une future migration renomme ou transforme des colonnes, convertir les anciennes sauvegardes dans `BackupService.importJson` (les colonnes absentes prennent leur valeur par défaut).
 - Premier build après changement de `pubspec.lock` : `sqlite3` télécharge SQLite depuis GitHub ; en cas de « Connection reset by peer », relancer.
 - Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter cassent le build Linux.
@@ -58,4 +61,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Restent à valider : identification photo Pl@ntNet sur iPhone, et photo d'une fiche Perenual affichée réseau coupé.
+Étape 6 entièrement validée. Suite (ROADMAP) : étape 7, finitions : illustrations kawaii, finitions Linux & web (sauvegarde déjà faite). Seul test reporté restant : notification Android (étape 4, test 5).

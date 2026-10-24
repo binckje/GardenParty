@@ -104,7 +104,6 @@ void main() {
     final api = gcal.CalendarApi(MockClient((req) async {
       calls.add('${req.method} ${req.url.path}');
       final json = {'content-type': 'application/json'};
-      if (req.url.path.endsWith('/users/me/calendarList')) return http.Response('{"items": []}', 200, headers: json);
       if (req.method == 'POST' && req.url.path.endsWith('/calendars')) {
         return http.Response('{"id": "cal1"}', 200, headers: json);
       }
@@ -121,6 +120,8 @@ void main() {
     final sync = GoogleCalendarSync(api);
     final cal = await sync.ensureCalendar(null);
     expect(cal, 'cal1');
+    // Pas de lecture de la liste des agendas : hors de la portée calendar.app.created.
+    expect(calls, isNot(contains(endsWith('/calendarList'))));
     await sync.sync(
       calendarId: cal,
       pending: [
