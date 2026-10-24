@@ -44,7 +44,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 2. ~~Calendrier Linux~~ : validé.
 3. ~~Export .ics~~ : validé.
 4. ~~Google Agenda~~ : validé.
-5. Android : notification à 9 h le jour d'un soin, même app fermée.
+5. Android : notification à 9 h le jour d'un soin, même app fermée. (reporté : pas d'appareil Android disponible pour l'instant).
 
 
 ## En attente de décision
@@ -61,4 +61,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Étape 6 entièrement validée. Suite (ROADMAP) : étape 7, finitions : illustrations kawaii, finitions Linux & web (sauvegarde déjà faite). Tests reportés de l'étape 4 toujours à faire.
+Étape 6 entièrement validée. Suite (ROADMAP) : étape 7, finitions : illustrations kawaii, finitions Linux & web (sauvegarde déjà faite). Seul test reporté restant : notification Android (étape 4, test 5).
