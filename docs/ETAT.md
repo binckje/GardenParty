@@ -35,7 +35,7 @@ Branche de travail : `claude/new-session-7hha19`.
 - Photos hors ligne : une fiche Perenual enregistre sa photo (taille moyenne `medium_url`) en data URI au lieu de l'adresse web (`lib/data/api/image_downloader.dart`, 800 Ko max). Échec (réseau, CORS sur le web, trop lourde) : l'adresse web reste, l'emoji s'affiche hors ligne, et `PlantLookupService.storeWebImagesOffline()` réessaie à chaque lancement (rattrape aussi les fiches déjà enregistrées). 59 tests OK. Non testé contre le vrai Perenual (réseau bloqué ici).
 - Source des fiches : section « 📚 Source » en bas de chaque fiche espèce (`speciesSource()` dans `species_mapper.dart`, déduite du préfixe d'id : Perenual, Tela Botanica, GBIF, fiche personnelle, catalogue), avec lien cliquable vers la page d'origine. Résultats de recherche en ligne : « · Perenual » ou « · GBIF, fiche simplifiée » ; propositions photo : « Identification Pl@ntNet ». 60 tests OK.
 - Recherche en ligne validée par l'utilisateur avec les vraies clés API.
-- Identification photo Pl@ntNet validée sur iPhone (5 propositions, fiche OK). Ajout : chaque proposition affiche une photo Pl@ntNet de l'espèce (`include-related-images=true`, `PlantNetMatch.imageUrl`, taille `s`) et le score en sous-titre ; repli emoji 🌿 ; sur le web `WebHtmlElementStrategy.fallback` si CORS. Non compilé ici (pas de Flutter dans le conteneur) : à vérifier par l'utilisateur.
+- Identification photo Pl@ntNet validée sur iPhone (5 propositions, fiche OK). Ajout : chaque proposition affiche une photo Pl@ntNet de l'espèce (`include-related-images=true`, `PlantNetMatch.imageUrl`, taille `s`) et le score en sous-titre ; repli emoji 🌿 ; sur le web `WebHtmlElementStrategy.fallback` si CORS. Validé par l'utilisateur sur iPhone.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -60,4 +60,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Restent à valider : photos des propositions Pl@ntNet (iPhone), et photo d'une fiche Perenual affichée réseau coupé.
+Reste à valider : photo d'une fiche Perenual affichée réseau coupé.
