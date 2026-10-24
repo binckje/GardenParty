@@ -42,7 +42,7 @@ Branche de travail : `claude/new-session-7hha19`.
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
 2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
-3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
+3. ~~Export .ics~~ : validé.
 4. ~~Google Agenda~~ : validé.
 5. Android : notification à 9 h le jour d'un soin, même app fermée.
 
