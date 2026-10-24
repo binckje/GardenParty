@@ -52,7 +52,13 @@ class PlantNetClient {
     if (res.statusCode == 404) return const [];
     if (res.statusCode != 200) {
       throw ApiException(
-        res.statusCode == 429 ? 'Quota Pl@ntNet atteint, réessaie demain.' : 'Erreur ${res.statusCode} de Pl@ntNet.',
+        switch (res.statusCode) {
+          429 => 'Quota Pl@ntNet atteint, réessaie demain.',
+          // Sur le web, Pl@ntNet refuse les origines absentes des « Authorized domains » du compte.
+          403 => 'Accès refusé par Pl@ntNet (403) : ajoute l\'adresse de l\'app (ex. 192.168.1.20) '
+              'dans « Authorized domains » sur my.plantnet.org, ou vérifie la clé.',
+          _ => 'Erreur ${res.statusCode} de Pl@ntNet.',
+        },
         statusCode: res.statusCode,
       );
     }
