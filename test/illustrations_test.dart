@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -66,5 +68,26 @@ void main() {
     await c.read(illustrationSettingsProvider.notifier).setSvg(IllustrationScene.emptyPlants, _svg);
     await tester.pumpAndSettle();
     expect(find.byType(SvgPicture), findsOneWidget);
+  });
+
+  testWidgets('petite jardinière : SVG de la scène, livre animé pendant la recherche', (tester) async {
+    final c = await _container({IllustrationSettingsNotifier.styleKey: 'girl'});
+    await _pump(tester, c);
+    await tester.pump();
+    expect(find.byType(SvgPicture), findsOneWidget);
+
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: c,
+      child: const MaterialApp(home: Scaffold(body: KawaiiIllustration(IllustrationScene.searching))),
+    ));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byWidgetPredicate((w) => w is CustomPaint && w.painter != null && w.painter is! MascotPainter), findsWidgets);
+  });
+
+  test('chaque scène a son dessin de petite jardinière', () {
+    for (final s in IllustrationScene.values) {
+      expect(File(s.girlAsset).existsSync(), isTrue, reason: s.girlAsset);
+    }
   });
 }

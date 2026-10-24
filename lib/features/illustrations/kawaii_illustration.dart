@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,8 +22,9 @@ class KawaiiIllustration extends ConsumerStatefulWidget {
   ConsumerState<KawaiiIllustration> createState() => _KawaiiIllustrationState();
 }
 
-class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with SingleTickerProviderStateMixin {
+class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with TickerProviderStateMixin {
   late final _bounce = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+  AnimationController? _pages;
 
   @override
   void didChangeDependencies() {
@@ -35,6 +38,7 @@ class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with Si
   @override
   void dispose() {
     _bounce.dispose();
+    _pages?.dispose();
     super.dispose();
   }
 
@@ -53,6 +57,7 @@ class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with Si
           errorBuilder: (_, __, ___) => _drawn(size),
         ),
       IllustrationStyle.emoji => _emoji(size),
+      IllustrationStyle.girl => _girl(size),
       _ => _drawn(size),
     };
     return Semantics(label: widget.scene.label, image: true, child: SizedBox.square(dimension: size, child: child));
@@ -65,6 +70,20 @@ class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with Si
           painter: MascotPainter(widget.scene.mood, bounce: Curves.easeInOut.transform(_bounce.value)),
         ),
       );
+
+  Widget _girl(double size) {
+    final picture = SvgPicture.asset(widget.scene.girlAsset, width: size, height: size);
+    if (widget.scene != IllustrationScene.searching) return picture;
+    // Pages du livre qui tournent tant que la recherche dure.
+    final pages = _pages ??= AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat();
+    return Stack(children: [
+      picture,
+      AnimatedBuilder(
+        animation: pages,
+        builder: (_, __) => CustomPaint(size: Size.square(size), painter: _PagePainter(pages.value)),
+      ),
+    ]);
+  }
 
   Widget _emoji(double size) => AnimatedBuilder(
         animation: _bounce,
@@ -82,6 +101,43 @@ class _KawaiiIllustrationState extends ConsumerState<KawaiiIllustration> with Si
           child: Text(widget.scene.emoji, style: TextStyle(fontSize: size * 0.45)),
         ),
       );
+}
+
+/// Page du livre de `girl_searching.svg` qui tourne autour de la reliure (repère 200 × 200 du SVG).
+class _PagePainter extends CustomPainter {
+  const _PagePainter(this.t);
+
+  /// 0..1 : la page tourne pendant les 60 premiers %, puis repos.
+  final double t;
+
+  static final _page = Path()
+    ..moveTo(130, 108)
+    ..quadraticBezierTo(114, 106, 100, 112)
+    ..lineTo(100, 140)
+    ..quadraticBezierTo(114, 134, 130, 136)
+    ..close();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (t >= 0.6) return;
+    final turn = cos(pi * Curves.easeInOut.transform(t / 0.6));
+    canvas.scale(size.width / 200, size.height / 200);
+    canvas.translate(100, 0);
+    canvas.scale(turn, 1);
+    canvas.translate(-100, -2 * (1 - turn.abs()));
+    canvas.drawPath(_page, Paint()..color = const Color(0xFFFFFDF6));
+    canvas.drawPath(
+      _page,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeJoin = StrokeJoin.round
+        ..color = KawaiiColors.cocoa,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_PagePainter old) => old.t != t;
 }
 
 /// Illustration + message, pour les écrans vides.
@@ -104,6 +160,23 @@ class EmptyState extends StatelessWidget {
               Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
+        ),
+      );
+}
+
+/// Attente d'une recherche : illustration « recherche en cours » + barre de progression.
+class SearchingIndicator extends StatelessWidget {
+  const SearchingIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            KawaiiIllustration(IllustrationScene.searching, size: 120),
+            SizedBox(height: 8),
+            SizedBox(width: 120, child: LinearProgressIndicator()),
+          ]),
         ),
       );
 }

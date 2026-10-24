@@ -24,7 +24,7 @@ VoidCallback _showSpinner(BuildContext context) {
     context: context,
     useRootNavigator: true,
     barrierDismissible: false,
-    builder: (_) => const Center(child: CircularProgressIndicator()),
+    builder: (_) => const Center(child: SearchingIndicator()),
   );
   return root.pop;
 }
@@ -90,7 +90,7 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
       future: _results,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator()));
+          return const Padding(padding: EdgeInsets.all(16), child: Center(child: SearchingIndicator()));
         }
         if (snap.hasError) {
           final e = snap.error;

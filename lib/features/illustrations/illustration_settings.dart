@@ -5,7 +5,8 @@ import '../calendar/care_service.dart' show prefsProvider;
 
 /// Rendu des illustrations, choisi dans les réglages.
 enum IllustrationStyle {
-  drawn('Dessins maison', 'Mascotte dessinée par l\'app'),
+  drawn('Dessins maison', 'Petit pot mascotte'),
+  girl('Petite jardinière', 'Jardinière en salopette'),
   emoji('Emojis', 'Emojis dans une bulle pastel'),
   custom('Mes images SVG', 'Tes fichiers SVG ; à défaut, les dessins maison');
 
@@ -18,16 +19,21 @@ enum MascotMood { happy, sleepy, curious, proud }
 
 /// Endroits de l'app qui affichent une illustration.
 enum IllustrationScene {
-  emptyPlants('Aucune plante', '🪴', MascotMood.happy),
-  emptyGarden('Plan vide', '🌱', MascotMood.curious),
-  noCare('Pas de soin (aucune plante)', '💧', MascotMood.sleepy),
-  allDone('Tous les soins faits', '🌸', MascotMood.proud),
-  notFound('Recherche sans résultat', '🔍', MascotMood.curious);
+  emptyPlants('Aucune plante', '🪴', MascotMood.happy, 'girl_plants'),
+  emptyGarden('Plan vide', '🌱', MascotMood.curious, 'girl_garden'),
+  noCare('Pas de soin (aucune plante)', '💧', MascotMood.sleepy, 'girl_care'),
+  allDone('Tous les soins faits', '🌸', MascotMood.proud, 'girl_care'),
+  searching('Recherche en cours', '📖', MascotMood.curious, 'girl_searching'),
+  notFound('Recherche sans résultat', '🔍', MascotMood.curious, 'girl_not_found');
 
-  const IllustrationScene(this.label, this.emoji, this.mood);
+  const IllustrationScene(this.label, this.emoji, this.mood, this._girl);
 
   final String label, emoji;
   final MascotMood mood;
+  final String _girl;
+
+  /// Dessin de la petite jardinière (`assets/illustrations/`).
+  String get girlAsset => 'assets/illustrations/$_girl.svg';
 }
 
 class IllustrationSettings {

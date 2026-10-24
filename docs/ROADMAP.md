@@ -7,4 +7,4 @@
 - [x] **4. Calendrier** : génération des tâches, validation, notifications, alertes d'oubli, export .ics, synchro Google Agenda
 - [x] **5. Lumière** : mesure (capteur Android, caméra calibrée, saisie), carte de chaleur, emplacements conseillés sur les fiches plante et espèce
 - [~] **6. API** : Perenual, Pl@ntNet (photo), GBIF, Tela Botanica, cache SQLite — recherche nom/photo dans le catalogue ; Wikipedia reporté
-- [~] **7. Finitions** : illustrations kawaii (3 styles au choix : dessins, emojis, SVG perso), sauvegarde/export (fait en avance), Linux & web
+- [~] **7. Finitions** : illustrations kawaii (4 styles au choix : pot mascotte, petite jardinière, emojis, SVG perso), sauvegarde/export (fait en avance), Linux & web
