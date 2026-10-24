@@ -50,6 +50,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Google sur iPhone : impossible depuis `http://<ip>` (Google exige https ou localhost). Contournement : synchro depuis Linux/Android, l'iPhone voit l'agenda via le compte Google ; sinon héberger le web en HTTPS (ex. GitHub Pages).
 
 ## Points d'attention
+- Pl@ntNet sur le web (iPhone) : sur my.plantnet.org, mettre l'adresse locale du PC (ex. `192.168.1.115`, une des formes `192.168.1.115`, `192.168.1.115:8080`, `https://192.168.1.115:8080`) dans « Authorized domains », et laisser « Authorized IPs » vide (comparé à l'IP publique ; une IP locale y donne 403 « remote IP not allowed »). Fixer l'IP du PC dans la box (réservation DHCP).
 - Sauvegarde : si une future migration renomme ou transforme des colonnes, convertir les anciennes sauvegardes dans `BackupService.importJson` (les colonnes absentes prennent leur valeur par défaut).
 - Premier build après changement de `pubspec.lock` : `sqlite3` télécharge SQLite depuis GitHub ; en cas de « Connection reset by peer », relancer.
 - Projet à garder sur une partition Linux (ext4/btrfs, ici `~/dev/GardenParty`) : sur NTFS, les liens de plugins Flutter cassent le build Linux.
