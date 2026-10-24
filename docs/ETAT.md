@@ -40,8 +40,8 @@ Branche de travail : `claude/new-session-7hha19`.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
-1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
-2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
+1. ~~Lancement~~ : fait.
+2. ~~Calendrier Linux~~ : validé.
 3. ~~Export .ics~~ : validé.
 4. ~~Google Agenda~~ : validé.
 5. Android : notification à 9 h le jour d'un soin, même app fermée.
