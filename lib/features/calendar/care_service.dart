@@ -34,6 +34,8 @@ extension<T> on Stream<T> {
 }
 
 const _calendarIdKey = 'google.calendarId';
+// Agenda gardé après déconnexion : une reconnexion le réutilise au lieu d'en créer un autre.
+const _lastCalendarIdKey = 'google.lastCalendarId';
 const _lastSyncKey = 'google.lastSync';
 
 class GoogleSyncState {
@@ -67,7 +69,7 @@ class GoogleSyncNotifier extends Notifier<GoogleSyncState> {
       }
       final prefs = ref.read(prefsProvider);
       final sync = GoogleCalendarSync(gcal.CalendarApi(client));
-      final calendarId = await sync.ensureCalendar(prefs.getString(_calendarIdKey));
+      final calendarId = await sync.ensureCalendar(prefs.getString(_calendarIdKey) ?? prefs.getString(_lastCalendarIdKey));
       await prefs.setString(_calendarIdKey, calendarId);
       final data = await ref.read(careServiceProvider).snapshot();
       final since = state.lastSync;
@@ -89,6 +91,8 @@ class GoogleSyncNotifier extends Notifier<GoogleSyncState> {
   Future<void> disconnect() async {
     await ref.read(googleAuthProvider).signOut();
     final prefs = ref.read(prefsProvider);
+    final calendarId = prefs.getString(_calendarIdKey);
+    if (calendarId != null) await prefs.setString(_lastCalendarIdKey, calendarId);
     await prefs.remove(_calendarIdKey);
     await prefs.remove(_lastSyncKey);
     state = const GoogleSyncState();

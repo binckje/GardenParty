@@ -16,6 +16,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - `lib/services/care_notifications.dart` : Android = rappels programmés à 9 h ; Linux = rappel à l'ouverture ; web = idem, à activer dans Réglages (autorisation navigateur).
   - `lib/services/google/` : synchro vers un agenda dédié « GardenParty 🌱 » (portée `calendar.app.created`). Linux/Android : client OAuth « bureau » + retour 127.0.0.1, jeton stocké. Web : `http://localhost:8080` seulement, jeton 1 h.
   - Réglages : notifications, Google Agenda (connecter / synchroniser / déconnecter).
+  - Correctif (setup réel par l'utilisateur) : `calendarList.list` donnait 403 `insufficient_scope` (hors portée `calendar.app.created`). Supprimé : l'agenda est créé au premier lien et son id mémorisé (`google.calendarId`, gardé après déconnexion dans `google.lastCalendarId` pour éviter un doublon ; 403/404 sur l'id = recréé). Non compilé ici (pas de Flutter dans le conteneur).
   - `scripts/patch_android.py` : desugaring + récepteurs de notifications dans `android/` (appelé par `dev.sh`). `dev.sh` passe `google_oauth.env` en `--dart-define-from-file` et fixe le port 8080 pour chrome.
   - 29 tests OK (Flutter 3.47). Build web vérifié dans Chromium. Builds Linux/Android non testés ici (pas de GTK ni SDK Android).
 - Étape 5 : lumière (`lib/features/light/`).
