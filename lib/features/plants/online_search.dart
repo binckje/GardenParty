@@ -8,6 +8,8 @@ import '../../data/api/plantnet_client.dart';
 import '../../data/providers.dart';
 import '../../models/plant.dart';
 import 'catalog_screen.dart';
+import '../illustrations/illustration_settings.dart';
+import '../illustrations/kawaii_illustration.dart';
 
 void _showError(BuildContext context, Object e) {
   final message = e is ApiException ? e.message : 'Erreur inattendue : $e';
@@ -99,7 +101,12 @@ class _OnlineResultsState extends ConsumerState<OnlineResults> {
           );
         }
         final hits = snap.data!;
-        if (hits.isEmpty) return const ListTile(leading: Icon(Icons.search_off), title: Text('Rien trouvé en ligne'));
+        if (hits.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Column(children: [KawaiiIllustration(IllustrationScene.notFound, size: 96), Text('Rien trouvé en ligne')]),
+          );
+        }
         return Column(children: [
           const ListTile(dense: true, title: Text('En ligne', style: TextStyle(fontWeight: FontWeight.bold))),
           for (final h in hits)

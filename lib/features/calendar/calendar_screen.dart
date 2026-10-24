@@ -10,6 +10,8 @@ import '../../models/care.dart';
 import '../../services/google/google_auth.dart';
 import 'care_planner.dart';
 import 'care_service.dart';
+import '../illustrations/illustration_settings.dart';
+import '../illustrations/kawaii_illustration.dart';
 
 class CalendarScreen extends ConsumerWidget {
   const CalendarScreen({super.key});
@@ -77,6 +79,15 @@ class CalendarScreen extends ConsumerWidget {
           : ListView(
               padding: const EdgeInsets.only(bottom: 24),
               children: [
+                if (overdue.isEmpty && dueToday.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Row(children: [
+                      KawaiiIllustration(IllustrationScene.allDone, size: 72),
+                      SizedBox(width: 12),
+                      Expanded(child: Text('Tout est fait pour aujourd\'hui, bravo !')),
+                    ]),
+                  ),
                 if (overdue.isNotEmpty) section('⚠️ En retard', overdue, color: Theme.of(context).colorScheme.error),
                 if (dueToday.isNotEmpty) section('Aujourd\'hui', dueToday),
                 if (later.isNotEmpty) section('À venir', later),
@@ -152,21 +163,8 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('💧', style: TextStyle(fontSize: 64)),
-            const SizedBox(height: 16),
-            Text(
-              hasPlants ? 'Rien à faire pour le moment.' : 'Ajoute des plantes (onglet Plantes) pour voir leurs soins ici.',
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+    return hasPlants
+        ? const EmptyState(IllustrationScene.allDone, 'Rien à faire pour le moment.\nTes plantes sont contentes !')
+        : const EmptyState(IllustrationScene.noCare, 'Ajoute des plantes (onglet Plantes) pour voir leurs soins ici.');
   }
 }

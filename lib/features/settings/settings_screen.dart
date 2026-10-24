@@ -10,6 +10,8 @@ import '../../data/backup.dart';
 import '../../data/providers.dart';
 import '../../services/google/google_auth.dart';
 import '../calendar/care_service.dart';
+import '../illustrations/illustration_settings.dart';
+import '../illustrations/kawaii_illustration.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -29,6 +31,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(title: const Text('Réglages'), backgroundColor: Colors.transparent),
       body: ListView(
         children: [
+          const _Header('Apparence'),
+          ..._appearance(),
           const _Header('Alertes'),
           SwitchListTile(
             title: const Text('Notifications des soins'),
@@ -117,6 +121,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _appearance() {
+    final settings = ref.watch(illustrationSettingsProvider);
+    final notifier = ref.read(illustrationSettingsProvider.notifier);
+    return [
+      RadioGroup<IllustrationStyle>(
+        groupValue: settings.style,
+        onChanged: (s) => notifier.setStyle(s!),
+        child: Column(children: [
+          for (final style in IllustrationStyle.values)
+            RadioListTile<IllustrationStyle>(
+              value: style,
+              title: Text(style.label),
+              subtitle: Text(style.description),
+              secondary: KawaiiIllustration(IllustrationScene.emptyPlants, size: 40, style: style),
+            ),
+        ]),
+      ),
+      if (settings.style == IllustrationStyle.custom)
+        for (final scene in IllustrationScene.values)
+          ListTile(
+            contentPadding: const EdgeInsets.only(left: 32, right: 16),
+            leading: KawaiiIllustration(scene, size: 40),
+            title: Text(scene.label),
+            subtitle: Text(settings.customSvgs.containsKey(scene) ? 'Image importée' : 'Dessin maison (aucune image)'),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              IconButton(tooltip: 'Importer un SVG', icon: const Icon(Icons.file_open), onPressed: () => _importSvg(scene)),
+              if (settings.customSvgs.containsKey(scene))
+                IconButton(tooltip: 'Retirer', icon: const Icon(Icons.delete_outline), onPressed: () => notifier.setSvg(scene, null)),
+            ]),
+          ),
+    ];
+  }
+
+  Future<void> _importSvg(IllustrationScene scene) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final file = await FilePicker.pickFile(
+        dialogTitle: 'Image SVG : ${scene.label}',
+        type: FileType.custom,
+        allowedExtensions: ['svg'],
+      );
+      if (file == null) return;
+      final text = utf8.decode(await file.xFile.readAsBytes(), allowMalformed: true);
+      if (!looksLikeSvg(text)) {
+        messenger.showSnackBar(const SnackBar(content: Text('Ce fichier n\'est pas une image SVG.')));
+        return;
+      }
+      await ref.read(illustrationSettingsProvider.notifier).setSvg(scene, text);
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Import impossible : $e')));
+    }
   }
 
   Future<void> _export() async {

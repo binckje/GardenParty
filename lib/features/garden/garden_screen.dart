@@ -16,6 +16,8 @@ import '../light/light_measure_sheet.dart';
 import '../light/light_meter.dart';
 import 'plan_geometry.dart';
 import 'plan_painter.dart';
+import '../illustrations/illustration_settings.dart';
+import '../illustrations/kawaii_illustration.dart';
 
 const _uuid = Uuid();
 const _walls = ['Haut', 'Droite', 'Bas', 'Gauche'];
@@ -489,7 +491,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
             if (async.hasError) Center(child: Text('Erreur de chargement : ${async.error}')),
             if (async.hasValue && spaces.isEmpty)
               const IgnorePointer(
-                child: Center(child: Text('🌱\nAjoute ta première pièce ou zone', textAlign: TextAlign.center)),
+                child: EmptyState(IllustrationScene.emptyGarden, 'Ajoute ta première pièce ou zone'),
               ),
             Positioned(
               right: 16,

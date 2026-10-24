@@ -37,6 +37,7 @@ Branche de travail : `claude/new-session-7hha19`.
 - Source des fiches : section « 📚 Source » en bas de chaque fiche espèce (`speciesSource()` dans `species_mapper.dart`, déduite du préfixe d'id : Perenual, Tela Botanica, GBIF, fiche personnelle, catalogue), avec lien cliquable vers la page d'origine. Résultats de recherche en ligne : « · Perenual » ou « · GBIF, fiche simplifiée » ; propositions photo : « Identification Pl@ntNet ». 60 tests OK.
 - Recherche en ligne validée par l'utilisateur avec les vraies clés API.
 - Identification photo Pl@ntNet validée sur iPhone (5 propositions, fiche OK). Ajout : chaque proposition affiche une photo Pl@ntNet de l'espèce (`include-related-images=true`, `PlantNetMatch.imageUrl`, taille `s`) et le score en sous-titre ; repli emoji 🌿 ; sur le web `WebHtmlElementStrategy.fallback` si CORS. Validé par l'utilisateur sur iPhone.
+- Étape 7, illustrations kawaii (en cours) : `lib/features/illustrations/`. Trois styles au choix dans Réglages > Apparence (`illustrationSettingsProvider`, `SharedPreferences`) : dessins maison (mascotte pot + pousse en `CustomPainter`, humeurs joyeuse / endormie / curieuse / fière), emojis dans une bulle pastel, SVG importés par l'utilisateur (un par scène, `flutter_svg`, repli sur le dessin si absent ou illisible). Scènes : aucune plante, plan vide, pas de soin, tout est fait (bandeau en haut du calendrier quand rien n'est dû aujourd'hui), recherche en ligne sans résultat. Petit rebond (3 fois) à l'affichage, coupé si « réduire les animations ». Les SVG importés ne sont pas dans la sauvegarde JSON. 64 tests OK (Flutter 3.47.8). À valider par l'utilisateur.
 
 ## Tests reportés (étape 4)
 Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
@@ -61,4 +62,4 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 - Le secret du client OAuth « bureau » est embarqué dans l'app (normal pour ce type de client selon Google) : ne pas réutiliser ce client ailleurs.
 
 ## Prochaine étape
-Étape 6 entièrement validée. Suite (ROADMAP) : étape 7, finitions : illustrations kawaii, finitions Linux & web (sauvegarde déjà faite). Seul test reporté restant : notification Android (étape 4, test 5).
+Valider les illustrations (étape 7). Reste de l'étape 7 à préciser : icône de l'app, écran d'accueil, finitions Linux & web (raccourcis clavier, mise en page large, PWA hors ligne, raccourci .desktop). Seul test reporté restant : notification Android (étape 4, test 5).

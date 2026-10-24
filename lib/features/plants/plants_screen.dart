@@ -5,6 +5,8 @@ import '../../data/providers.dart';
 import 'catalog_screen.dart';
 import 'plant_screen.dart';
 import 'species_view.dart';
+import '../illustrations/illustration_settings.dart';
+import '../illustrations/kawaii_illustration.dart';
 
 /// Plantes possédées ; le bouton « Ajouter » ouvre le catalogue.
 class PlantsScreen extends ConsumerWidget {
@@ -27,7 +29,7 @@ class PlantsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur de chargement : $e')),
         data: (list) => list.isEmpty
-            ? const Center(child: Text('🪴\nAucune plante pour l’instant.\nAjoute-en depuis le catalogue !', textAlign: TextAlign.center))
+            ? const EmptyState(IllustrationScene.emptyPlants, 'Aucune plante pour l’instant.\nAjoute-en depuis le catalogue !')
             : ListView(
                 padding: const EdgeInsets.only(bottom: 88),
                 children: [
