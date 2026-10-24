@@ -97,6 +97,11 @@ Map<String, dynamic> _routes(Uri url) => switch (url.path) {
                 'family': {'scientificNameWithoutAuthor': 'Araceae'},
               },
               'gbif': {'id': '2868241'},
+              'images': [
+                {
+                  'url': {'o': 'https://bs.plantnet.org/o.jpg', 'm': 'https://bs.plantnet.org/m.jpg', 's': 'https://bs.plantnet.org/s.jpg'},
+                },
+              ],
             }
           ],
         },
@@ -194,6 +199,7 @@ void main() {
     final matches = await lookup.identifyPhoto([Uint8List.fromList([1, 2, 3])]);
     expect(matches.single.scientificName, 'Monstera deliciosa');
     expect(matches.single.gbifKey, 2868241);
+    expect(matches.single.imageUrl, 'https://bs.plantnet.org/s.jpg');
     expect((await lookup.speciesForMatch(matches.single)).id, 'perenual-42');
   });
 

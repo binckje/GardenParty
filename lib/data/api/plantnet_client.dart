@@ -13,6 +13,7 @@ class PlantNetMatch {
     this.commonNames = const [],
     this.family,
     this.gbifKey,
+    this.imageUrl,
   });
 
   final double score;
@@ -20,6 +21,9 @@ class PlantNetMatch {
   final List<String> commonNames;
   final String? family;
   final int? gbifKey;
+
+  /// Petite photo Pl@ntNet de l'espèce (aide au choix), si fournie.
+  final String? imageUrl;
 }
 
 /// Pl@ntNet : identification par photo (jamais mise en cache). Sur le web, le domaine de l'app
@@ -36,7 +40,7 @@ class PlantNetClient {
   Future<List<PlantNetMatch>> identify(List<Uint8List> images) async {
     if (!configured) throw ApiException('Clé Pl@ntNet absente (PLANTNET_KEY dans .env).');
     final url = Uri.parse('https://my-api.plantnet.org/v2/identify/all')
-        .replace(queryParameters: {'api-key': _key, 'lang': 'fr', 'nb-results': '5'});
+        .replace(queryParameters: {'api-key': _key, 'lang': 'fr', 'nb-results': '5', 'include-related-images': 'true'});
     final req = http.MultipartRequest('POST', url);
     for (final (i, bytes) in images.indexed) {
       req.files.add(http.MultipartFile.fromBytes('images', bytes, filename: 'photo$i.jpg'));
@@ -71,7 +75,14 @@ class PlantNetClient {
           commonNames: (r['species']['commonNames'] as List? ?? const []).cast<String>(),
           family: r['species']['family']?['scientificNameWithoutAuthor'] as String?,
           gbifKey: int.tryParse('${r['gbif']?['id'] ?? ''}'),
+          imageUrl: _thumbnail(r['images']),
         ),
     ];
+  }
+
+  static String? _thumbnail(Object? images) {
+    if (images is! List || images.isEmpty) return null;
+    final url = (images.first as Map<String, dynamic>)['url'] as Map<String, dynamic>?;
+    return (url?['s'] ?? url?['m']) as String?;
   }
 }

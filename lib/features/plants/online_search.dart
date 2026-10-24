@@ -180,9 +180,26 @@ Future<void> identifyFromPhoto(BuildContext context, WidgetRef ref) async {
         ),
         for (final m in matches)
           ListTile(
-            leading: Text('${(m.score * 100).round()} %'),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox.square(
+                dimension: 56,
+                child: m.imageUrl == null
+                    ? const Center(child: Text('🌿', style: TextStyle(fontSize: 28)))
+                    : Image.network(
+                        m.imageUrl!,
+                        fit: BoxFit.cover,
+                        // Sur le web, repli sur une balise <img> si l'hôte des photos refuse le CORS.
+                        webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+                        errorBuilder: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 28))),
+                      ),
+              ),
+            ),
             title: Text(m.commonNames.firstOrNull ?? m.scientificName),
-            subtitle: Text(m.scientificName, style: const TextStyle(fontStyle: FontStyle.italic)),
+            subtitle: Text(
+              '${m.scientificName} · ${(m.score * 100).round()} %',
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
             onTap: () => Navigator.pop(c, m),
           ),
       ]),
