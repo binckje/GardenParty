@@ -16,7 +16,7 @@ Branche de travail : `claude/new-session-7hha19`.
   - `lib/services/care_notifications.dart` : Android = rappels programmés à 9 h ; Linux = rappel à l'ouverture ; web = idem, à activer dans Réglages (autorisation navigateur).
   - `lib/services/google/` : synchro vers un agenda dédié « GardenParty 🌱 » (portée `calendar.app.created`). Linux/Android : client OAuth « bureau » + retour 127.0.0.1, jeton stocké. Web : `http://localhost:8080` seulement, jeton 1 h.
   - Réglages : notifications, Google Agenda (connecter / synchroniser / déconnecter).
-  - Correctif (setup réel par l'utilisateur) : `calendarList.list` donnait 403 `insufficient_scope` (hors portée `calendar.app.created`). Supprimé : l'agenda est créé au premier lien et son id mémorisé (`google.calendarId`, gardé après déconnexion dans `google.lastCalendarId` pour éviter un doublon ; 403/404 sur l'id = recréé). Non compilé ici (pas de Flutter dans le conteneur).
+  - Correctif (setup réel par l'utilisateur) : `calendarList.list` donnait 403 `insufficient_scope` (hors portée `calendar.app.created`). Supprimé : l'agenda est créé au premier lien et son id mémorisé (`google.calendarId`, gardé après déconnexion dans `google.lastCalendarId` pour éviter un doublon ; 403/404 sur l'id = recréé). Validé par l'utilisateur sur Linux : agenda « GardenParty 🌱 » visible. Piège rencontré : activer « Google Calendar API » dans le même projet que le client OAuth (sinon 403 « has not been used in project … »).
   - `scripts/patch_android.py` : desugaring + récepteurs de notifications dans `android/` (appelé par `dev.sh`). `dev.sh` passe `google_oauth.env` en `--dart-define-from-file` et fixe le port 8080 pour chrome.
   - 29 tests OK (Flutter 3.47). Build web vérifié dans Chromium. Builds Linux/Android non testés ici (pas de GTK ni SDK Android).
 - Étape 5 : lumière (`lib/features/light/`).
@@ -43,7 +43,7 @@ Calendrier v1 validé par l'utilisateur. Tests ci-dessous à faire plus tard :
 1. `./scripts/dev.sh` → 1 (pubspec.lock a changé : `flutter clean` automatique).
 2. Linux : ajoute une plante (onglet Plantes) → Calendrier : arrosage + engrais aujourd'hui, pastille, notification système. « Fait ✓ » → le soin suivant passe dans « À venir ».
 3. Bouton partage (Calendrier, en haut à droite) → `gardenparty-soins.ics` → l'importer dans Google Agenda (web : Paramètres > Importer et exporter) ou l'ouvrir sur iPhone.
-4. Google Agenda (facultatif) : suivre `google_oauth.env.example`, créer `google_oauth.env`, relancer, Réglages → « Connecter Google Agenda » → agenda « GardenParty 🌱 » visible dans Google Agenda.
+4. ~~Google Agenda~~ : validé.
 5. Android : notification à 9 h le jour d'un soin, même app fermée.
 
 
