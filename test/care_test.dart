@@ -99,11 +99,22 @@ void main() {
     expect(eventIdFor('5f1c-Ab_é'), id);
   });
 
-  test('synchro Google : agenda créé, insertion, mise à jour si existe, suppression des soins faits', () async {
+  test('synchro Google : agenda créé, insertion, mise à jour si modifié, suppression des soins faits', () async {
     final calls = <String>[];
     final api = gcal.CalendarApi(MockClient((req) async {
       calls.add('${req.method} ${req.url.path}');
       final json = {'content-type': 'application/json'};
+      if (req.method == 'GET' && req.url.path.endsWith('/events')) {
+        return http.Response(
+            jsonEncode({
+              'items': [
+                {'id': eventIdFor('old'), 'summary': 'ancien titre'},
+                {'id': eventIdFor('gone'), 'summary': 'fait'},
+              ]
+            }),
+            200,
+            headers: json);
+      }
       if (req.method == 'POST' && req.url.path.endsWith('/calendars')) {
         return http.Response('{"id": "cal1"}', 200, headers: json);
       }
@@ -132,7 +143,37 @@ void main() {
       plantName: (_) => 'Basilic',
     );
     expect(calls.where((c) => c.startsWith('PUT')).single, endsWith('/events/${eventIdFor('old')}'));
+    expect(calls.where((c) => c.startsWith('POST') && c.endsWith('/events')), hasLength(1));
     expect(calls.last, 'DELETE /calendar/v3/calendars/cal1/events/${eventIdFor('gone')}');
+  });
+
+  test('synchro Google : limite de débit rejouée, rien de renvoyé si à jour', () async {
+    final task = CareTask(id: 'same', plantId: 'p1', type: CareType.watering, dueAt: DateTime.utc(2026, 6, 1, 9));
+    final calls = <String>[];
+    var limited = true;
+    final api = gcal.CalendarApi(MockClient((req) async {
+      calls.add(req.method);
+      final json = {'content-type': 'application/json'};
+      if (limited) {
+        limited = false;
+        return http.Response('{"error": {"code": 403, "message": "Rate Limit Exceeded"}}', 403, headers: json);
+      }
+      return http.Response(
+          jsonEncode({
+            'items': [
+              {
+                'id': eventIdFor('same'),
+                'summary': '${careEmoji(task.type)} ${careLabel(task.type)} : Basilic',
+                'start': {'dateTime': '2026-06-01T09:00:00Z'},
+              }
+            ]
+          }),
+          200,
+          headers: json);
+    }));
+    await GoogleCalendarSync(api, retryDelay: Duration.zero)
+        .sync(calendarId: 'cal1', pending: [task], done: const [], plantName: (_) => 'Basilic');
+    expect(calls, ['GET', 'GET']);
   });
 
   group('service et écran', () {
