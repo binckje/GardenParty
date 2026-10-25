@@ -16,6 +16,10 @@ class PlantSpecies {
     this.diagnostics = const [],
     this.cutting,
     this.repotting,
+    this.sowingMonths = const [],
+    this.rowSpacingCm,
+    this.plantSpacingCm,
+    this.notes,
   });
 
   final String id;
@@ -32,6 +36,15 @@ class PlantSpecies {
   final PropagationInfo? cutting;
   final RepottingInfo? repotting;
 
+  /// Mois (1-12) de semis ; vide si inconnu.
+  final List<int> sowingMonths;
+
+  /// Plantation : intervalle entre les rangs et espacement entre plants sur le rang, en cm.
+  final int? rowSpacingCm, plantSpacingCm;
+
+  /// Notes libres de l'utilisateur.
+  final String? notes;
+
   /// Même fiche avec un autre visuel.
   PlantSpecies withImage(String? image) => PlantSpecies(
         id: id,
@@ -47,6 +60,10 @@ class PlantSpecies {
         diagnostics: diagnostics,
         cutting: cutting,
         repotting: repotting,
+        sowingMonths: sowingMonths,
+        rowSpacingCm: rowSpacingCm,
+        plantSpacingCm: plantSpacingCm,
+        notes: notes,
       );
 
   /// Entrée de la base locale `assets/plants_fr.json` (clé `image` : emoji ou chemin d'image).
@@ -64,6 +81,10 @@ class PlantSpecies {
         diagnostics: [for (final d in j['diagnostics'] as List? ?? []) Diagnostic.fromJson(d as Map<String, dynamic>)],
         cutting: j['cutting'] == null ? null : PropagationInfo.fromJson(j['cutting'] as Map<String, dynamic>),
         repotting: j['repotting'] == null ? null : RepottingInfo.fromJson(j['repotting'] as Map<String, dynamic>),
+        sowingMonths: (j['sowingMonths'] as List? ?? const []).cast<int>(),
+        rowSpacingCm: j['rowSpacingCm'] as int?,
+        plantSpacingCm: j['plantSpacingCm'] as int?,
+        notes: j['notes'] as String?,
       );
 }
 

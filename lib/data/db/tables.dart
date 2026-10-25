@@ -67,6 +67,10 @@ class PlantSpeciesTable extends Table {
   TextColumn get diagnostics => text().map(const DiagnosticsConverter())();
   TextColumn get cutting => text().map(const PropagationConverter()).nullable()();
   TextColumn get repotting => text().map(const RepottingConverter()).nullable()();
+  TextColumn get sowingMonths => text().map(const MonthsConverter()).withDefault(const Constant('[]'))();
+  IntColumn get rowSpacingCm => integer().nullable()();
+  IntColumn get plantSpacingCm => integer().nullable()();
+  TextColumn get notes => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

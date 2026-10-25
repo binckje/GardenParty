@@ -39,6 +39,10 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
   late final _cuttingMethod = TextEditingController(text: widget.initial?.cutting?.method);
   late final _repotYears = TextEditingController(text: '${widget.initial?.repotting?.everyYears ?? 2}');
   late final _repotPeriod = TextEditingController(text: widget.initial?.repotting?.period ?? 'printemps');
+  late final _rowSpacing = TextEditingController(text: widget.initial?.rowSpacingCm?.toString());
+  late final _plantSpacing = TextEditingController(text: widget.initial?.plantSpacingCm?.toString());
+  late final _notes = TextEditingController(text: widget.initial?.notes);
+  late final Set<int> _sowing = {...?widget.initial?.sowingMonths};
   late String? _image = widget.initial?.imageUrl;
   late final Set<LightLevel> _light = {...?widget.initial?.light};
   late bool _cutting = widget.initial?.cutting?.possible ?? false;
@@ -102,6 +106,10 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
         everyYears: _repotting ? int.tryParse(_repotYears.text) : null,
         period: _repotting ? _blankToNull(_repotPeriod.text) : null,
       ),
+      sowingMonths: _sowing.toList()..sort(),
+      rowSpacingCm: int.tryParse(_rowSpacing.text.trim()),
+      plantSpacingCm: int.tryParse(_plantSpacing.text.trim()),
+      notes: _blankToNull(_notes.text),
     );
     await ref.read(plantRepositoryProvider).saveSpecies(species);
     if (mounted) Navigator.pop(context, species);
@@ -202,6 +210,14 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
                     child: TextFormField(
                         controller: _repotPeriod, decoration: const InputDecoration(labelText: 'Période'))),
               ]),
+            _title('🌱 Époque de semis'),
+            _monthChips(_sowing),
+            _title('📏 Plantation (cm)'),
+            Row(children: [
+              Expanded(child: _numberField(_rowSpacing, 'Entre les rangs', optional: true)),
+              const SizedBox(width: 12),
+              Expanded(child: _numberField(_plantSpacing, 'Entre les plants', optional: true)),
+            ]),
             _title('🩺 Problèmes fréquents'),
             for (final (i, d) in _diagnostics.indexed)
               Card(
@@ -232,6 +248,14 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
                 onPressed: () => setState(() => _diagnostics.add(_DiagnosticFields(null))),
               ),
             ),
+            _title('📝 Notes'),
+            TextFormField(
+              controller: _notes,
+              decoration: const InputDecoration(hintText: 'Ce que tu veux…', border: OutlineInputBorder()),
+              minLines: 3,
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+            ),
             const SizedBox(height: 16),
             FilledButton.icon(icon: const Icon(Icons.check), label: const Text('Enregistrer'), onPressed: _save),
           ],
@@ -251,21 +275,23 @@ class _SpeciesEditorScreenState extends ConsumerState<SpeciesEditorScreen> {
                   validator: _required)),
         ]),
         const SizedBox(height: 4),
-        Wrap(spacing: 2, children: [
-          for (var m = 1; m <= 12; m++)
-            FilterChip(
-              label: Text(_monthLetters[m - 1]),
-              tooltip: 'Mois $m',
-              showCheckmark: false,
-              visualDensity: VisualDensity.compact,
-              selected: f.months.contains(m),
-              onSelected: (on) => setState(() => on ? f.months.add(m) : f.months.remove(m)),
-            ),
-        ]),
+        _monthChips(f.months),
         const Align(
           alignment: Alignment.centerLeft,
           child: Text('Mois de pleine saison (fréquence réduite le reste de l\'année)', style: TextStyle(fontSize: 12)),
         ),
+      ]);
+
+  Widget _monthChips(Set<int> months) => Wrap(spacing: 2, children: [
+        for (var m = 1; m <= 12; m++)
+          FilterChip(
+            label: Text(_monthLetters[m - 1]),
+            tooltip: 'Mois $m',
+            showCheckmark: false,
+            visualDensity: VisualDensity.compact,
+            selected: months.contains(m),
+            onSelected: (on) => setState(() => on ? months.add(m) : months.remove(m)),
+          ),
       ]);
 
   Widget _numberField(TextEditingController c, String label, {bool decimal = false, bool optional = false}) =>

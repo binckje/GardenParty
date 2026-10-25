@@ -42,6 +42,10 @@ class PlantRepository {
         diagnostics: s.diagnostics,
         cutting: Value(s.cutting),
         repotting: Value(s.repotting),
+        sowingMonths: Value(s.sowingMonths),
+        rowSpacingCm: Value(s.rowSpacingCm),
+        plantSpacingCm: Value(s.plantSpacingCm),
+        notes: Value(s.notes),
       );
 
   Stream<List<OwnedPlant>> watchOwnedPlants() {
@@ -77,6 +81,10 @@ class PlantRepository {
         diagnostics: r.diagnostics,
         cutting: r.cutting,
         repotting: r.repotting,
+        sowingMonths: r.sowingMonths,
+        rowSpacingCm: r.rowSpacingCm,
+        plantSpacingCm: r.plantSpacingCm,
+        notes: r.notes,
       );
 
   OwnedPlant _owned(OwnedPlantRow r) =>

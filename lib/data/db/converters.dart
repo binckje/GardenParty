@@ -16,6 +16,16 @@ class LightLevelsConverter extends TypeConverter<List<LightLevel>, String> {
   String toSql(List<LightLevel> value) => jsonEncode(value.map((l) => l.name).toList());
 }
 
+class MonthsConverter extends TypeConverter<List<int>, String> {
+  const MonthsConverter();
+
+  @override
+  List<int> fromSql(String fromDb) => (jsonDecode(fromDb) as List).cast<int>();
+
+  @override
+  String toSql(List<int> value) => jsonEncode(value);
+}
+
 class CareScheduleConverter extends TypeConverter<CareSchedule, String> {
   const CareScheduleConverter();
 

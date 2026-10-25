@@ -1198,6 +1198,31 @@ class $PlantSpeciesTableTable extends PlantSpeciesTable
           .withConverter<RepottingInfo?>(
               $PlantSpeciesTableTable.$converterrepottingn);
   @override
+  late final GeneratedColumnWithTypeConverter<List<int>, String> sowingMonths =
+      GeneratedColumn<String>('sowing_months', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: const Constant('[]'))
+          .withConverter<List<int>>(
+              $PlantSpeciesTableTable.$convertersowingMonths);
+  static const VerificationMeta _rowSpacingCmMeta =
+      const VerificationMeta('rowSpacingCm');
+  @override
+  late final GeneratedColumn<int> rowSpacingCm = GeneratedColumn<int>(
+      'row_spacing_cm', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _plantSpacingCmMeta =
+      const VerificationMeta('plantSpacingCm');
+  @override
+  late final GeneratedColumn<int> plantSpacingCm = GeneratedColumn<int>(
+      'plant_spacing_cm', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
   List<GeneratedColumn> get $columns => [
         id,
         scientificName,
@@ -1211,7 +1236,11 @@ class $PlantSpeciesTableTable extends PlantSpeciesTable
         fertilizing,
         diagnostics,
         cutting,
-        repotting
+        repotting,
+        sowingMonths,
+        rowSpacingCm,
+        plantSpacingCm,
+        notes
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1266,6 +1295,22 @@ class $PlantSpeciesTableTable extends PlantSpeciesTable
     } else if (isInserting) {
       context.missing(_soilMeta);
     }
+    if (data.containsKey('row_spacing_cm')) {
+      context.handle(
+          _rowSpacingCmMeta,
+          rowSpacingCm.isAcceptableOrUnknown(
+              data['row_spacing_cm']!, _rowSpacingCmMeta));
+    }
+    if (data.containsKey('plant_spacing_cm')) {
+      context.handle(
+          _plantSpacingCmMeta,
+          plantSpacingCm.isAcceptableOrUnknown(
+              data['plant_spacing_cm']!, _plantSpacingCmMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
     return context;
   }
 
@@ -1307,6 +1352,15 @@ class $PlantSpeciesTableTable extends PlantSpeciesTable
       repotting: $PlantSpeciesTableTable.$converterrepottingn.fromSql(
           attachedDatabase.typeMapping
               .read(DriftSqlType.string, data['${effectivePrefix}repotting'])),
+      sowingMonths: $PlantSpeciesTableTable.$convertersowingMonths.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}sowing_months'])!),
+      rowSpacingCm: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}row_spacing_cm']),
+      plantSpacingCm: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}plant_spacing_cm']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
     );
   }
 
@@ -1331,6 +1385,8 @@ class $PlantSpeciesTableTable extends PlantSpeciesTable
       const RepottingConverter();
   static TypeConverter<RepottingInfo?, String?> $converterrepottingn =
       NullAwareTypeConverter.wrap($converterrepotting);
+  static TypeConverter<List<int>, String> $convertersowingMonths =
+      const MonthsConverter();
 }
 
 class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
@@ -1347,6 +1403,10 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
   final List<Diagnostic> diagnostics;
   final PropagationInfo? cutting;
   final RepottingInfo? repotting;
+  final List<int> sowingMonths;
+  final int? rowSpacingCm;
+  final int? plantSpacingCm;
+  final String? notes;
   const PlantSpeciesRow(
       {required this.id,
       required this.scientificName,
@@ -1360,7 +1420,11 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       required this.fertilizing,
       required this.diagnostics,
       this.cutting,
-      this.repotting});
+      this.repotting,
+      required this.sowingMonths,
+      this.rowSpacingCm,
+      this.plantSpacingCm,
+      this.notes});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1397,6 +1461,19 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       map['repotting'] = Variable<String>(
           $PlantSpeciesTableTable.$converterrepottingn.toSql(repotting));
     }
+    {
+      map['sowing_months'] = Variable<String>(
+          $PlantSpeciesTableTable.$convertersowingMonths.toSql(sowingMonths));
+    }
+    if (!nullToAbsent || rowSpacingCm != null) {
+      map['row_spacing_cm'] = Variable<int>(rowSpacingCm);
+    }
+    if (!nullToAbsent || plantSpacingCm != null) {
+      map['plant_spacing_cm'] = Variable<int>(plantSpacingCm);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
     return map;
   }
 
@@ -1421,6 +1498,15 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       repotting: repotting == null && nullToAbsent
           ? const Value.absent()
           : Value(repotting),
+      sowingMonths: Value(sowingMonths),
+      rowSpacingCm: rowSpacingCm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rowSpacingCm),
+      plantSpacingCm: plantSpacingCm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plantSpacingCm),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
     );
   }
 
@@ -1441,6 +1527,10 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       diagnostics: serializer.fromJson<List<Diagnostic>>(json['diagnostics']),
       cutting: serializer.fromJson<PropagationInfo?>(json['cutting']),
       repotting: serializer.fromJson<RepottingInfo?>(json['repotting']),
+      sowingMonths: serializer.fromJson<List<int>>(json['sowingMonths']),
+      rowSpacingCm: serializer.fromJson<int?>(json['rowSpacingCm']),
+      plantSpacingCm: serializer.fromJson<int?>(json['plantSpacingCm']),
+      notes: serializer.fromJson<String?>(json['notes']),
     );
   }
   @override
@@ -1460,6 +1550,10 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       'diagnostics': serializer.toJson<List<Diagnostic>>(diagnostics),
       'cutting': serializer.toJson<PropagationInfo?>(cutting),
       'repotting': serializer.toJson<RepottingInfo?>(repotting),
+      'sowingMonths': serializer.toJson<List<int>>(sowingMonths),
+      'rowSpacingCm': serializer.toJson<int?>(rowSpacingCm),
+      'plantSpacingCm': serializer.toJson<int?>(plantSpacingCm),
+      'notes': serializer.toJson<String?>(notes),
     };
   }
 
@@ -1476,7 +1570,11 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
           CareSchedule? fertilizing,
           List<Diagnostic>? diagnostics,
           Value<PropagationInfo?> cutting = const Value.absent(),
-          Value<RepottingInfo?> repotting = const Value.absent()}) =>
+          Value<RepottingInfo?> repotting = const Value.absent(),
+          List<int>? sowingMonths,
+          Value<int?> rowSpacingCm = const Value.absent(),
+          Value<int?> plantSpacingCm = const Value.absent(),
+          Value<String?> notes = const Value.absent()}) =>
       PlantSpeciesRow(
         id: id ?? this.id,
         scientificName: scientificName ?? this.scientificName,
@@ -1491,6 +1589,12 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
         diagnostics: diagnostics ?? this.diagnostics,
         cutting: cutting.present ? cutting.value : this.cutting,
         repotting: repotting.present ? repotting.value : this.repotting,
+        sowingMonths: sowingMonths ?? this.sowingMonths,
+        rowSpacingCm:
+            rowSpacingCm.present ? rowSpacingCm.value : this.rowSpacingCm,
+        plantSpacingCm:
+            plantSpacingCm.present ? plantSpacingCm.value : this.plantSpacingCm,
+        notes: notes.present ? notes.value : this.notes,
       );
   PlantSpeciesRow copyWithCompanion(PlantSpeciesTableCompanion data) {
     return PlantSpeciesRow(
@@ -1512,6 +1616,16 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
           data.diagnostics.present ? data.diagnostics.value : this.diagnostics,
       cutting: data.cutting.present ? data.cutting.value : this.cutting,
       repotting: data.repotting.present ? data.repotting.value : this.repotting,
+      sowingMonths: data.sowingMonths.present
+          ? data.sowingMonths.value
+          : this.sowingMonths,
+      rowSpacingCm: data.rowSpacingCm.present
+          ? data.rowSpacingCm.value
+          : this.rowSpacingCm,
+      plantSpacingCm: data.plantSpacingCm.present
+          ? data.plantSpacingCm.value
+          : this.plantSpacingCm,
+      notes: data.notes.present ? data.notes.value : this.notes,
     );
   }
 
@@ -1530,7 +1644,11 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
           ..write('fertilizing: $fertilizing, ')
           ..write('diagnostics: $diagnostics, ')
           ..write('cutting: $cutting, ')
-          ..write('repotting: $repotting')
+          ..write('repotting: $repotting, ')
+          ..write('sowingMonths: $sowingMonths, ')
+          ..write('rowSpacingCm: $rowSpacingCm, ')
+          ..write('plantSpacingCm: $plantSpacingCm, ')
+          ..write('notes: $notes')
           ..write(')'))
         .toString();
   }
@@ -1549,7 +1667,11 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
       fertilizing,
       diagnostics,
       cutting,
-      repotting);
+      repotting,
+      sowingMonths,
+      rowSpacingCm,
+      plantSpacingCm,
+      notes);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1566,7 +1688,11 @@ class PlantSpeciesRow extends DataClass implements Insertable<PlantSpeciesRow> {
           other.fertilizing == this.fertilizing &&
           other.diagnostics == this.diagnostics &&
           other.cutting == this.cutting &&
-          other.repotting == this.repotting);
+          other.repotting == this.repotting &&
+          other.sowingMonths == this.sowingMonths &&
+          other.rowSpacingCm == this.rowSpacingCm &&
+          other.plantSpacingCm == this.plantSpacingCm &&
+          other.notes == this.notes);
 }
 
 class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
@@ -1583,6 +1709,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
   final Value<List<Diagnostic>> diagnostics;
   final Value<PropagationInfo?> cutting;
   final Value<RepottingInfo?> repotting;
+  final Value<List<int>> sowingMonths;
+  final Value<int?> rowSpacingCm;
+  final Value<int?> plantSpacingCm;
+  final Value<String?> notes;
   final Value<int> rowid;
   const PlantSpeciesTableCompanion({
     this.id = const Value.absent(),
@@ -1598,6 +1728,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
     this.diagnostics = const Value.absent(),
     this.cutting = const Value.absent(),
     this.repotting = const Value.absent(),
+    this.sowingMonths = const Value.absent(),
+    this.rowSpacingCm = const Value.absent(),
+    this.plantSpacingCm = const Value.absent(),
+    this.notes = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PlantSpeciesTableCompanion.insert({
@@ -1614,6 +1748,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
     required List<Diagnostic> diagnostics,
     this.cutting = const Value.absent(),
     this.repotting = const Value.absent(),
+    this.sowingMonths = const Value.absent(),
+    this.rowSpacingCm = const Value.absent(),
+    this.plantSpacingCm = const Value.absent(),
+    this.notes = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         scientificName = Value(scientificName),
@@ -1639,6 +1777,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
     Expression<String>? diagnostics,
     Expression<String>? cutting,
     Expression<String>? repotting,
+    Expression<String>? sowingMonths,
+    Expression<int>? rowSpacingCm,
+    Expression<int>? plantSpacingCm,
+    Expression<String>? notes,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1655,6 +1797,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
       if (diagnostics != null) 'diagnostics': diagnostics,
       if (cutting != null) 'cutting': cutting,
       if (repotting != null) 'repotting': repotting,
+      if (sowingMonths != null) 'sowing_months': sowingMonths,
+      if (rowSpacingCm != null) 'row_spacing_cm': rowSpacingCm,
+      if (plantSpacingCm != null) 'plant_spacing_cm': plantSpacingCm,
+      if (notes != null) 'notes': notes,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1673,6 +1819,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
       Value<List<Diagnostic>>? diagnostics,
       Value<PropagationInfo?>? cutting,
       Value<RepottingInfo?>? repotting,
+      Value<List<int>>? sowingMonths,
+      Value<int?>? rowSpacingCm,
+      Value<int?>? plantSpacingCm,
+      Value<String?>? notes,
       Value<int>? rowid}) {
     return PlantSpeciesTableCompanion(
       id: id ?? this.id,
@@ -1688,6 +1838,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
       diagnostics: diagnostics ?? this.diagnostics,
       cutting: cutting ?? this.cutting,
       repotting: repotting ?? this.repotting,
+      sowingMonths: sowingMonths ?? this.sowingMonths,
+      rowSpacingCm: rowSpacingCm ?? this.rowSpacingCm,
+      plantSpacingCm: plantSpacingCm ?? this.plantSpacingCm,
+      notes: notes ?? this.notes,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1742,6 +1896,20 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
       map['repotting'] = Variable<String>(
           $PlantSpeciesTableTable.$converterrepottingn.toSql(repotting.value));
     }
+    if (sowingMonths.present) {
+      map['sowing_months'] = Variable<String>($PlantSpeciesTableTable
+          .$convertersowingMonths
+          .toSql(sowingMonths.value));
+    }
+    if (rowSpacingCm.present) {
+      map['row_spacing_cm'] = Variable<int>(rowSpacingCm.value);
+    }
+    if (plantSpacingCm.present) {
+      map['plant_spacing_cm'] = Variable<int>(plantSpacingCm.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1764,6 +1932,10 @@ class PlantSpeciesTableCompanion extends UpdateCompanion<PlantSpeciesRow> {
           ..write('diagnostics: $diagnostics, ')
           ..write('cutting: $cutting, ')
           ..write('repotting: $repotting, ')
+          ..write('sowingMonths: $sowingMonths, ')
+          ..write('rowSpacingCm: $rowSpacingCm, ')
+          ..write('plantSpacingCm: $plantSpacingCm, ')
+          ..write('notes: $notes, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3759,6 +3931,10 @@ typedef $$PlantSpeciesTableTableCreateCompanionBuilder
   required List<Diagnostic> diagnostics,
   Value<PropagationInfo?> cutting,
   Value<RepottingInfo?> repotting,
+  Value<List<int>> sowingMonths,
+  Value<int?> rowSpacingCm,
+  Value<int?> plantSpacingCm,
+  Value<String?> notes,
   Value<int> rowid,
 });
 typedef $$PlantSpeciesTableTableUpdateCompanionBuilder
@@ -3776,6 +3952,10 @@ typedef $$PlantSpeciesTableTableUpdateCompanionBuilder
   Value<List<Diagnostic>> diagnostics,
   Value<PropagationInfo?> cutting,
   Value<RepottingInfo?> repotting,
+  Value<List<int>> sowingMonths,
+  Value<int?> rowSpacingCm,
+  Value<int?> plantSpacingCm,
+  Value<String?> notes,
   Value<int> rowid,
 });
 
@@ -3860,6 +4040,21 @@ class $$PlantSpeciesTableTableFilterComposer
           column: $table.repotting,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
+  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
+      get sowingMonths => $composableBuilder(
+          column: $table.sowingMonths,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<int> get rowSpacingCm => $composableBuilder(
+      column: $table.rowSpacingCm, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get plantSpacingCm => $composableBuilder(
+      column: $table.plantSpacingCm,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
   Expression<bool> ownedPlantsRefs(
       Expression<bool> Function($$OwnedPlantsTableFilterComposer f) f) {
     final $$OwnedPlantsTableFilterComposer composer = $composerBuilder(
@@ -3930,6 +4125,21 @@ class $$PlantSpeciesTableTableOrderingComposer
 
   ColumnOrderings<String> get repotting => $composableBuilder(
       column: $table.repotting, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get sowingMonths => $composableBuilder(
+      column: $table.sowingMonths,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get rowSpacingCm => $composableBuilder(
+      column: $table.rowSpacingCm,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get plantSpacingCm => $composableBuilder(
+      column: $table.plantSpacingCm,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
 }
 
 class $$PlantSpeciesTableTableAnnotationComposer
@@ -3981,6 +4191,19 @@ class $$PlantSpeciesTableTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<RepottingInfo?, String> get repotting =>
       $composableBuilder(column: $table.repotting, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<int>, String> get sowingMonths =>
+      $composableBuilder(
+          column: $table.sowingMonths, builder: (column) => column);
+
+  GeneratedColumn<int> get rowSpacingCm => $composableBuilder(
+      column: $table.rowSpacingCm, builder: (column) => column);
+
+  GeneratedColumn<int> get plantSpacingCm => $composableBuilder(
+      column: $table.plantSpacingCm, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   Expression<T> ownedPlantsRefs<T extends Object>(
       Expression<T> Function($$OwnedPlantsTableAnnotationComposer a) f) {
@@ -4042,6 +4265,10 @@ class $$PlantSpeciesTableTableTableManager extends RootTableManager<
             Value<List<Diagnostic>> diagnostics = const Value.absent(),
             Value<PropagationInfo?> cutting = const Value.absent(),
             Value<RepottingInfo?> repotting = const Value.absent(),
+            Value<List<int>> sowingMonths = const Value.absent(),
+            Value<int?> rowSpacingCm = const Value.absent(),
+            Value<int?> plantSpacingCm = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PlantSpeciesTableCompanion(
@@ -4058,6 +4285,10 @@ class $$PlantSpeciesTableTableTableManager extends RootTableManager<
             diagnostics: diagnostics,
             cutting: cutting,
             repotting: repotting,
+            sowingMonths: sowingMonths,
+            rowSpacingCm: rowSpacingCm,
+            plantSpacingCm: plantSpacingCm,
+            notes: notes,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4074,6 +4305,10 @@ class $$PlantSpeciesTableTableTableManager extends RootTableManager<
             required List<Diagnostic> diagnostics,
             Value<PropagationInfo?> cutting = const Value.absent(),
             Value<RepottingInfo?> repotting = const Value.absent(),
+            Value<List<int>> sowingMonths = const Value.absent(),
+            Value<int?> rowSpacingCm = const Value.absent(),
+            Value<int?> plantSpacingCm = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PlantSpeciesTableCompanion.insert(
@@ -4090,6 +4325,10 @@ class $$PlantSpeciesTableTableTableManager extends RootTableManager<
             diagnostics: diagnostics,
             cutting: cutting,
             repotting: repotting,
+            sowingMonths: sowingMonths,
+            rowSpacingCm: rowSpacingCm,
+            plantSpacingCm: plantSpacingCm,
+            notes: notes,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

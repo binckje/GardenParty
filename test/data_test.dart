@@ -70,6 +70,34 @@ void main() {
     expect(s.diagnostics.single.symptom, 'Feuilles jaunes');
     expect(s.cutting!.method, contains('nœud'));
     expect(s.repotting, isNull);
+    expect(s.sowingMonths, isEmpty);
+    expect(s.notes, isNull);
+  });
+
+  test('espèce : semis, plantation et notes enregistrés', () async {
+    final repo = container.read(plantRepositoryProvider);
+    final m = _monstera();
+    await repo.saveSpecies(PlantSpecies(
+      id: 'tomate',
+      scientificName: 'Solanum lycopersicum',
+      commonName: 'Tomate',
+      light: m.light,
+      minTempC: 10,
+      maxTempC: 30,
+      soil: m.soil,
+      watering: m.watering,
+      fertilizing: m.fertilizing,
+      sowingMonths: [2, 3, 4],
+      rowSpacingCm: 80,
+      plantSpacingCm: 50,
+      notes: 'Tuteurer.\nPincer les gourmands.',
+    ));
+
+    final s = (await repo.getSpecies('tomate'))!;
+    expect(s.sowingMonths, [2, 3, 4]);
+    expect(s.rowSpacingCm, 80);
+    expect(s.plantSpacingCm, 50);
+    expect(s.notes, contains('gourmands'));
   });
 
   test('suppression pièce : plante non placée ; suppression plante : tâches supprimées', () async {
