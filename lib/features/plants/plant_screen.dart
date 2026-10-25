@@ -6,6 +6,7 @@ import '../../data/providers.dart';
 import '../../models/plant.dart';
 import '../dialogs.dart';
 import '../light/suggested_spots.dart';
+import 'species_editor.dart';
 import 'species_view.dart';
 
 /// Ouvre le plan en mode placement pour cette plante.
@@ -49,6 +50,13 @@ class PlantScreen extends ConsumerWidget {
               if (name != null) await update((p) => p.nickname = name);
             },
           ),
+          if (species != null)
+            IconButton(
+              tooltip: 'Modifier la fiche (semis, plantation, notes…)',
+              icon: const Icon(Icons.note_alt_outlined),
+              onPressed: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => SpeciesEditorScreen(initial: species))),
+            ),
           IconButton(
             tooltip: 'Supprimer',
             icon: const Icon(Icons.delete_outline),

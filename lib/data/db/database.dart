@@ -22,12 +22,22 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, from, to) async {
           if (from < 2) await m.createTable(apiCacheEntries);
+          if (from < 3) {
+            for (final c in <GeneratedColumn>[
+              plantSpeciesTable.sowingMonths,
+              plantSpeciesTable.rowSpacingCm,
+              plantSpeciesTable.plantSpacingCm,
+              plantSpeciesTable.notes,
+            ]) {
+              await m.addColumn(plantSpeciesTable, c);
+            }
+          }
         },
         beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
       );

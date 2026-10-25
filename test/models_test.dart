@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden_party/models/care.dart';
+import 'package:garden_party/features/plants/species_view.dart';
 import 'package:garden_party/models/garden.dart';
 
 void main() {
@@ -15,5 +16,11 @@ void main() {
     expect(t.isOverdue(DateTime(2026, 1, 2)), isTrue);
     t.doneAt = DateTime(2026, 1, 2);
     expect(t.isOverdue(DateTime(2026, 1, 3)), isFalse);
+  });
+
+  test('monthsLabel regroupe les mois consécutifs', () {
+    expect(monthsLabel([3, 4, 5, 9]), 'mars à mai, sept.');
+    expect(monthsLabel([6]), 'juin');
+    expect(monthsLabel(List.generate(12, (i) => i + 1)), 'toute l’année');
   });
 }

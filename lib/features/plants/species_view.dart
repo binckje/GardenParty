@@ -17,6 +17,22 @@ String lightLabel(LightLevel l) => switch (l) {
       LightLevel.fullSun => 'Plein soleil',
     };
 
+/// Mois regroupés en périodes : [3, 4, 5, 9] → « mars à mai, sept. ».
+String monthsLabel(List<int> months) {
+  if (months.length == 12) return 'toute l’année';
+  final sorted = months.toSet().toList()..sort();
+  final parts = <String>[];
+  for (var i = 0; i < sorted.length;) {
+    var j = i;
+    while (j + 1 < sorted.length && sorted[j + 1] == sorted[j] + 1) {
+      j++;
+    }
+    parts.add(i == j ? _months[sorted[i] - 1] : '${_months[sorted[i] - 1]} à ${_months[sorted[j] - 1]}');
+    i = j + 1;
+  }
+  return parts.join(', ');
+}
+
 /// Emoji de la plante, utilisable dans un texte ou sur le plan.
 String speciesEmoji(PlantSpecies? s) {
   final v = s?.imageUrl;
@@ -111,6 +127,15 @@ class SpeciesDetails extends StatelessWidget {
                 ].join(', ')
               : 'Pas nécessaire'),
         ),
+        if (s.sowingMonths.isNotEmpty) _Section('🌱 Semis', Text(monthsLabel(s.sowingMonths))),
+        if (s.rowSpacingCm != null || s.plantSpacingCm != null)
+          _Section(
+            '📏 Plantation',
+            Text([
+              if (s.rowSpacingCm case final r?) '$r cm entre les rangs',
+              if (s.plantSpacingCm case final p?) '$p cm entre les plants',
+            ].join(', ')),
+          ),
         if (s.diagnostics.isNotEmpty)
           _Section('🩺 Problèmes fréquents', Column(children: [
             for (final d in s.diagnostics)
@@ -122,6 +147,7 @@ class SpeciesDetails extends StatelessWidget {
                 children: [Text('Cause : ${d.cause}'), Text('Remède : ${d.treatment}')],
               ),
           ])),
+        if (s.notes case final n? when n.trim().isNotEmpty) _Section('📝 Notes', Text(n)),
         _SourceSection(speciesSource(s.id)),
       ],
     );
